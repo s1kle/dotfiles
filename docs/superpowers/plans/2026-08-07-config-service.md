@@ -59,11 +59,12 @@ Singleton {
     property var font: defaults.font
     property var widgets: defaults.widgets
 
-    property string baseText: ""
-    property string hostText: ""
+    property var baseJson: null // last-good parsed base config
+    property var hostJson: null // last-good parsed host config
     property bool warnedInvalid: false
 
     function parseJson(text: string): var {
+        if (text === "") return undefined
         try {
             return JSON.parse(text)
         } catch (e) {
@@ -71,12 +72,12 @@ Singleton {
                 console.warn(`Config: invalid JSON, keeping last good state: ${e?.message ?? e}`)
                 root.warnedInvalid = true
             }
-            return null
+            return undefined
         }
     }
 
     // Merge driven by base keys: override keys absent from base are ignored,
-    // objects recurse, scalars/arrays are replaced wholesale.
+    // objects recurse, scalars are replaced wholesale.
     function deepMerge(base: var, override: var): var {
         if (override === undefined || override === null) return base
         if (typeof base !== "object" || typeof override !== "object") return override
@@ -87,14 +88,25 @@ Singleton {
         return out
     }
 
+    // Per-file last-good: a failed parse leaves that file's previous parsed
+    // state in place, so one broken file never reverts its keys to defaults.
+    function onBaseText(text: string): void {
+        const parsed = root.parseJson(text)
+        if (parsed !== undefined) root.baseJson = parsed
+        root.reapply()
+    }
+
+    function onHostText(text: string): void {
+        const parsed = root.parseJson(text)
+        if (parsed !== undefined) root.hostJson = parsed
+        root.reapply()
+    }
+
     function reapply(): void {
-        const base = root.parseJson(root.baseText)
-        const host = root.parseJson(root.hostText)
-        if (root.baseText === "" && root.hostText === "") return
-        if (base === null && host === null) return // keep last good state
+        if (root.baseJson === null && root.hostJson === null) return // nothing loaded yet
         let merged = root.defaults
-        if (base !== null) merged = root.deepMerge(merged, base)
-        if (host !== null) merged = root.deepMerge(merged, host)
+        if (root.baseJson !== null) merged = root.deepMerge(merged, root.baseJson)
+        if (root.hostJson !== null) merged = root.deepMerge(merged, root.hostJson)
         root.theme = merged.theme
         root.layout = merged.layout
         root.shadow = merged.shadow
@@ -108,8 +120,8 @@ Singleton {
         id: baseFile
         path: Quickshell.shellPath("config.json")
         watchChanges: true
-        onLoaded: { root.baseText = text(); root.reapply() }
-        onFileChanged: { root.baseText = text(); root.reapply() }
+        onLoaded: { root.onBaseText(text()) }
+        onFileChanged: { root.onBaseText(text()) }
         onLoadFailed: err => console.warn(`Config: config.json not loaded: ${FileViewError.toString(err)}`)
     }
 
@@ -117,8 +129,8 @@ Singleton {
         id: hostFile
         path: root.hostname !== "" ? Quickshell.shellPath(`config.${root.hostname}.json`) : ""
         watchChanges: true
-        onLoaded: { root.hostText = text(); root.reapply() }
-        onFileChanged: { root.hostText = text(); root.reapply() }
+        onLoaded: { root.onHostText(text()) }
+        onFileChanged: { root.onHostText(text()) }
         onLoadFailed: () => {} // host file is optional
     }
 
