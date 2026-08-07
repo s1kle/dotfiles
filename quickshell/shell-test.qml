@@ -30,6 +30,13 @@ ShellRoot {
             for (const d of Bluetooth.devices) {
                 console.log("SMOKE BT:", d.name, "conn", d.connected, "paired", d.paired, d.batteryAvailable ? "bat " + d.battery + "%" : "no-battery")
             }
+            console.log("SMOKE Config: host", Config.hostname, "valid", Config.valid,
+                        "theme", Config.theme.name,
+                        "layout", Config.layout.barHeight + "x" + Config.layout.barWidth,
+                        "radius", Config.layout.radius, "padding", Config.layout.padding,
+                        "shadow", Config.shadow.blur + "/" + Config.shadow.opacity,
+                        "font", Config.font.family, Config.font.sizes.bar + "/" + Config.font.sizes.clock + "/" + Config.font.sizes.title,
+                        "widgets", JSON.stringify(Config.widgets))
             console.log("SMOKE SysUsage: gpu", SystemUsage.gpuType, "cpu", SystemUsage.cpuPerc.toFixed(0) + "%",
                         "mem", SystemUsage.memPerc.toFixed(0) + "%", "disk", SystemUsage.diskPerc.toFixed(0) + "%",
                         "net", SystemUsage.downloadSpeed.toFixed(0) + "B/s", "| lastTotal:", SystemUsage.lastCpuTotal)

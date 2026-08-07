@@ -7,7 +7,7 @@ import QtQuick
 Singleton {
     id: root
 
-    property string currentTheme: "NordTheme"
+    property string currentTheme: Config.theme.name
 
     property color background
     property color surface

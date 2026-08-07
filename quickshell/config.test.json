@@ -1,0 +1,5 @@
+{
+  "layout": { "barWidth": 640, "radius": 16 },
+  "font": { "sizes": { "clock": 16 } },
+  "widgets": { "Music": false, "Battery": true }
+}
