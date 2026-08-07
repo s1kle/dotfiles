@@ -7,3 +7,5 @@ singleton Audio Audio.qml
 singleton Network Network.qml
 singleton Bluetooth Bluetooth.qml
 singleton Config Config.qml
+singleton Brightness Brightness.qml
+singleton NotificationService NotificationService.qml
