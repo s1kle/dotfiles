@@ -2,4 +2,6 @@
 *.swp
 .superpowers/
 .claude/
-quickshell/config.player.json
+.config/quickshell/config.player.json
+testing/
+/CLAUDE.md
