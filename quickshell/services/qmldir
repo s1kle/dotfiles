@@ -1,0 +1,8 @@
+singleton Battery Battery.qml
+singleton SystemUsage SystemUsage.qml
+singleton Time Time.qml
+singleton Mpris Mpris.qml
+singleton Theme Theme.qml
+singleton Audio Audio.qml
+singleton Network Network.qml
+singleton Bluetooth Bluetooth.qml

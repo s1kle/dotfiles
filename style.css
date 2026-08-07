@@ -1,0 +1,171 @@
+/* ---------- design tokens ---------- */
+
+:root {
+    --bg: #17181c;
+    --surface: #23252b;
+    --surface-2: #2d2f36;
+    --text: #e8e9ec;
+    --text-dim: #9a9ca5;
+}
+
+/* ---------- reset & base ---------- */
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    font-family: "Annotation Mono", monospace;
+    color: var(--text);
+    background-color: var(--bg);
+}
+
+/* ---------- top bar ---------- */
+
+.top-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 34px;
+    width: 350px;
+    padding: 4px 12px;
+    border-radius: 0 0 12px 12px;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    background-color: var(--surface);
+    transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
+}
+
+.top-bar:hover {
+    width: 600px;
+    height: 180px;
+}
+
+.time,
+.track {
+    transition: opacity 0.1s ease;
+}
+
+.track {
+    color: var(--text-dim);
+}
+
+.top-bar:hover .time,
+.top-bar:hover .track {
+    opacity: 0;
+}
+
+/* ---------- popup widgets ---------- */
+
+.widget {
+    position: absolute;
+    top: -160px;
+    border-radius: 12px;
+    background-color: var(--surface-2);
+    transition: top 0.3s ease, opacity 0.3s ease;
+}
+
+.top-bar:hover .widget {
+    top: 10px;
+}
+
+.weather,
+.music {
+    width: 160px;
+    height: 160px;
+}
+
+.weather { left: 10px; }
+.music { right: 10px; }
+
+.workspaces {
+    top: -80px;
+    width: 115px;
+    height: 75px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    left: 180px;
+}
+
+.workspaces--alt { left: auto; right: 180px; }
+
+.settings {
+    top: -80px;
+    right: 55px;
+    width: 240px;
+    height: 75px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: top 0.3s ease, right 0.3s ease, height 0.3s ease;
+}
+
+.top-bar:hover .settings {
+    top: 95px;
+    right: 180px;
+}
+
+/* ---------- workspace dots ---------- */
+
+.workspaces-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    background-color: white;
+    transition: width 0.3s ease;
+}
+
+.dot:hover {
+    width: 32px;
+}
+
+.dot--inactive {
+    background-color: rgb(54, 54, 54);
+}
+
+/* ---------- sliders ---------- */
+
+.slider {
+    display: flex;
+    gap: 4px;
+}
+
+.slider-track,
+.slider-fill {
+    height: 16px;
+    border-radius: 9999px;
+    background-color: rgb(92, 92, 92);
+    transition: width 0.3s ease;
+}
+
+.slider-track {
+    position: relative;
+    width: 200px;
+}
+
+.slider-fill {
+    position: absolute;
+    left: 0;
+    width: 80px;
+    background-color: white;
+}
+
+svg {
+    color: white
+}
