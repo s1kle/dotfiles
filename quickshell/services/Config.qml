@@ -16,7 +16,11 @@ Singleton {
         theme: { name: "NordTheme" },
         layout: { barHeight: 34, barWidth: 700, radius: 12, padding: 8, margin: 6, gap: 4 },
         shadow: { blur: 16, offsetY: 2, opacity: 0.35 },
-        font: { family: "Inter", sizes: { bar: 12, clock: 14, title: 11 } },
+        font: { family: "Annotation Mono", sizes: { bar: 12, clock: 14, title: 11 } },
+        weather: { city: "Приморский край, Находка" },
+        panel: { size: 120 },
+        progress: { size: 66, width: 8 },
+        slider: { width: 180, height: 78, thickness: 18 },
         widgets: { Music: true, Weather: true, Workspaces: true, Settings: true, Battery: true, Bluetooth: true },
     })
 
@@ -24,6 +28,10 @@ Singleton {
     property var layout: defaults.layout
     property var shadow: defaults.shadow
     property var font: defaults.font
+    property var weather: defaults.weather
+    property var panel: defaults.panel
+    property var progress: defaults.progress
+    property var slider: defaults.slider
     property var widgets: defaults.widgets
 
     property var baseJson: null // last-good parsed base config
@@ -78,6 +86,10 @@ Singleton {
         root.layout = merged.layout
         root.shadow = merged.shadow
         root.font = merged.font
+        root.weather = merged.weather
+        root.panel = merged.panel
+        root.progress = merged.progress
+        root.slider = merged.slider
         root.widgets = merged.widgets
         root.valid = true
         root.warnedInvalid = false
