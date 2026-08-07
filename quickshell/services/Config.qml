@@ -1,4 +1,3 @@
-```qml
 pragma Singleton
 
 import Quickshell
@@ -113,4 +112,3 @@ Singleton {
         onLoadFailed: () => {} // no hostname -> base config only
     }
 }
-```
