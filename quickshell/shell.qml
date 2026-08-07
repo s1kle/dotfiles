@@ -1,14 +1,22 @@
 import Quickshell
-import Quickshell.Hyprland
 import QtQuick
 
+import qs.modules
+
 ShellRoot {
-    id: root
+    Variants {
+        model: Quickshell.screens
+
+        Bar {
+            required property var modelData
+            screen: modelData
+        }
+    }
 
     Variants {
         model: Quickshell.screens
 
-        TopBar {
+        Notifications {
             required property var modelData
             screen: modelData
         }
