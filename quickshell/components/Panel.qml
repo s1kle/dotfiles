@@ -45,24 +45,27 @@ Item {
         height: childrenRect.height
     }
 
-    Text {
+    Loader {
         anchors.bottom: card.bottom
         anchors.bottomMargin: root.padding
         anchors.horizontalCenter: card.horizontalCenter
-        text: root.title
-        color: Theme.textDim
-        font.family: Config.font.family
-        font.pixelSize: 11
-        font.weight: Font.DemiBold
-        font.letterSpacing: 11 * 0.12 // 0.12em
-        font.capitalization: Font.AllUppercase
-        font.strikeout: root.titleStrikethrough
+        sourceComponent: root.titleInteractive ? clickableTitle : plainTitle
 
-        MouseArea {
-            anchors.fill: parent
-            enabled: root.titleInteractive
-            cursorShape: Qt.PointingHandCursor
-            onClicked: root.titleClicked()
+        Component {
+            id: plainTitle
+            Label {
+                text: root.title
+                strikethrough: root.titleStrikethrough
+            }
+        }
+
+        Component {
+            id: clickableTitle
+            ClickableLabel {
+                text: root.title
+                strikethrough: root.titleStrikethrough
+                onClicked: root.titleClicked()
+            }
         }
     }
 }

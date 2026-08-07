@@ -44,15 +44,9 @@ Item {
         width: root.panelWidth - 2 * root.padH
         spacing: 6
 
-        Text {
+        Label {
             Layout.fillWidth: true
             text: root.title
-            color: Theme.textDim
-            font.family: Config.font.family
-            font.pixelSize: 11
-            font.weight: Font.DemiBold
-            font.letterSpacing: 11 * 0.12 // 0.12em
-            font.capitalization: Font.AllUppercase
         }
     }
 
