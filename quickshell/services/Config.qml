@@ -12,13 +12,13 @@ Singleton {
 
     // QML-side defaults; JSON files override these. Section objects are
     // replaced wholesale on reload so widget bindings re-evaluate.
-    property var defaults: {
+    property var defaults: ({
         theme: { name: "NordTheme" },
         layout: { barHeight: 34, barWidth: 700, radius: 12, padding: 8, margin: 6, gap: 4 },
         shadow: { blur: 16, offsetY: 2, opacity: 0.35 },
         font: { family: "Inter", sizes: { bar: 12, clock: 14, title: 11 } },
         widgets: { Music: true, Weather: true, Workspaces: true, Settings: true, Battery: true, Bluetooth: true },
-    }
+    })
 
     property var theme: defaults.theme
     property var layout: defaults.layout
@@ -88,7 +88,7 @@ Singleton {
         path: Quickshell.shellPath("config.json")
         watchChanges: true
         onLoaded: { root.onBaseText(text()) }
-        onFileChanged: { root.onBaseText(text()) }
+        onFileChanged: baseFile.reload() // reload re-reads then fires onLoaded with fresh text
         onLoadFailed: err => console.warn(`Config: config.json not loaded: ${FileViewError.toString(err)}`)
     }
 
@@ -97,7 +97,7 @@ Singleton {
         path: root.hostname !== "" ? Quickshell.shellPath(`config.${root.hostname}.json`) : ""
         watchChanges: true
         onLoaded: { root.onHostText(text()) }
-        onFileChanged: { root.onHostText(text()) }
+        onFileChanged: hostFile.reload() // reload re-reads then fires onLoaded with fresh text
         onLoadFailed: () => {} // host file is optional
     }
 
