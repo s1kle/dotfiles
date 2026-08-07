@@ -1,0 +1,12 @@
+-- hl.on("hyprland.start", function () 
+--   hl.exec_cmd(terminal)
+--   hl.exec_cmd("nm-applet")
+--   hl.exec_cmd("waybar & hyprpaper & firefox")
+-- end)
+
+hl.on("hyprland.start", function ()
+    hl.exec_cmd("quickshell")
+    hl.exec_cmd("hypridle")
+    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &")
+    hl.exec_cmd("LD_PRELOAD=/usr/lib/libEGL.so.1 linux-wallpaperengine --scaling stretch --screen-root eDP-1 --bg $(ls -d ~/.steam/steam/steamapps/workshop/content/431960/* | xargs -n 1 basename | shuf -n 1)")
+end)
