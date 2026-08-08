@@ -22,6 +22,7 @@ Singleton {
         progress: { size: 66, width: 8 },
         slider: { width: 180, height: 78, thickness: 18 },
         widgets: { Music: true, Weather: true, Workspaces: true, Settings: true, Battery: true, Bluetooth: true },
+        topbar: { collapseDelay: 1500 },
     })
 
     property var theme: defaults.theme
@@ -33,6 +34,7 @@ Singleton {
     property var progress: defaults.progress
     property var slider: defaults.slider
     property var widgets: defaults.widgets
+    property var topbar: defaults.topbar
 
     property var baseJson: null // last-good parsed base config
     property var hostJson: null // last-good parsed host config
@@ -91,6 +93,7 @@ Singleton {
         root.progress = merged.progress
         root.slider = merged.slider
         root.widgets = merged.widgets
+        root.topbar = merged.topbar
         root.valid = true
         root.warnedInvalid = false
     }
