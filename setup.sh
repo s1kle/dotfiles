@@ -11,6 +11,18 @@
 
 set -eo pipefail
 
+if [[ -z "$DOTFILES_CLONED" ]]; then
+    export DOTFILES_CLONED=1
+    TMP_DIR="$(mktemp -d)"
+    trap 'rm -rf "$TMP_DIR"' EXIT
+    
+    echo "Cloning dotfiles repository..."
+    git clone --depth 1 https://github.com/s1kle/dotfiles.git "$TMP_DIR"
+    cd "$TMP_DIR"
+    exec bash install.sh "$@"
+    exit
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Load shared helpers + every step module (00-core first by glob order).
