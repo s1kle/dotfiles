@@ -133,7 +133,7 @@ PanelWindow {
                 onPlayPause: Mpris.togglePlaying()
                 onSeek: frac => {
                     const p = Mpris.activePlayer
-                    if (p && p.canSeek) p.position = frac * p.length
+                    if (p && p.canSeek) { p.position = frac * p.length; win.musicPos = frac * p.length }
                 }
             }
         }
@@ -152,5 +152,12 @@ PanelWindow {
         repeat: true
         triggeredOnStart: true
         onTriggered: win.musicPos = Mpris.activePlayer ? Mpris.activePlayer.position : 0
+    }
+
+    // reset the bar the instant the track changes, instead of waiting for the
+    // next poll tick (bar was lagging ~1s behind prev/next).
+    Connections {
+        target: Mpris.activePlayer
+        function onTrackTitleChanged() { win.musicPos = 0 }
     }
 }

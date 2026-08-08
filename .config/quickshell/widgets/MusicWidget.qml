@@ -54,22 +54,37 @@ Row {
         }
     }
 
-    Column {
+    // Item wrapper (writable implicitWidth) so the widget fits its content —
+    // track/artist natural width + buttons — capped so a very long title elides
+    // instead of stretching the pill open. Drives TopBar's pill width.
+    Item {
         id: main
-        width: 178
+        property int maxWidth: 260
         anchors.verticalCenter: parent.verticalCenter
+        // cap off meta's own implicitWidth (a Layout computes it from child
+        // hints, independent of allocated width) — referencing inner.implicitWidth
+        // instead loops through inner.width → main.width → 0.
+        implicitWidth: Math.min(maxWidth, meta.implicitWidth)
+        implicitHeight: inner.implicitHeight
+
+        Column {
+        id: inner
+        width: parent.width
         spacing: 6
 
         RowLayout {
+            id: meta
             width: parent.width
             spacing: 8
 
             ColumnLayout {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 spacing: 0
 
                 Text {
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: root.track
                     color: Theme.text
                     font.family: Config.font.family
@@ -78,6 +93,7 @@ Row {
                 }
                 Text {
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: root.artist
                     color: Theme.textDim
                     font.family: Config.font.family
@@ -87,24 +103,27 @@ Row {
             }
 
             RowLayout {
-                spacing: 8
-                MediaButton {
-                    kind: "prev"
-                    size: 12
-                    color: Theme.textDim
+                spacing: 6
+                Button {
+                    text: "Prev"
+                    fontSize: 11
+                    hpad: 7
+                    textColor: Theme.textDim
                     enabled: root.canPrev
                     onClicked: root.prev()
                 }
-                MediaButton {
-                    kind: root.playing ? "pause" : "play"
-                    size: 15
-                    color: Theme.text
+                Button {
+                    text: root.playing ? "Pause" : "Play"
+                    fontSize: 11
+                    hpad: 7
+                    textColor: Theme.text
                     onClicked: root.playPause()
                 }
-                MediaButton {
-                    kind: "next"
-                    size: 12
-                    color: Theme.textDim
+                Button {
+                    text: "Next"
+                    fontSize: 11
+                    hpad: 7
+                    textColor: Theme.textDim
                     enabled: root.canNext
                     onClicked: root.next()
                 }
@@ -116,6 +135,7 @@ Row {
             value: root.length > 0 ? root.position / root.length : 0
             seekable: root.canSeek
             onSeek: frac => root.seek(frac)
+        }
         }
     }
 }
