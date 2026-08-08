@@ -24,6 +24,7 @@ PACMAN_PACKAGES=(
 AUR_PACKAGES=(
     hyprqt6engine
     hyprmod
+    linux-wallpaperengine-git
 )
 
 setup_pacman_packages() {

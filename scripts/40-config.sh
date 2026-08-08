@@ -15,6 +15,7 @@ setup_config() {
     fi
 
     info "Installing .config"
+    mkdir -p "$HOME/.config"
     cp -r "$config_dir/." "$HOME/.config/"
     ok ".config installed"
 }

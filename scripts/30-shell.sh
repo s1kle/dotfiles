@@ -11,7 +11,11 @@ setup_shell() {
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     fi
 
-    info "Setting zsh theme to 'candy'"
-    sed -i 's/ZSH_THEME=".*"/ZSH_THEME="candy"/' "$HOME/.zshrc"
+    if [[ -f "$HOME/.zshrc" ]]; then
+        info "Setting zsh theme to 'candy'"
+        sed -i 's/ZSH_THEME=".*"/ZSH_THEME="candy"/' "$HOME/.zshrc"
+    else
+        warn ".zshrc not found, skipping theme"
+    fi
     ok "zsh configured"
 }
