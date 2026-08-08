@@ -10,6 +10,7 @@ Rectangle {
 
     property alias text: input.text
     property alias input: input
+    property string placeholder: "APP"
     signal navigate(int delta)
     signal accepted()
     signal cancelled()
@@ -44,7 +45,7 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             visible: input.text === ""
-            text: "APP"
+            text: root.placeholder
             color: Theme.textDim
             font.family: Config.font.family
             font.pixelSize: 14

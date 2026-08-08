@@ -152,6 +152,7 @@ PanelWindow {
 
     Search {
         id: search
+        placeholder: "APP"
         anchors.centerIn: parent
         onNavigate: d => {
             if (win.results.length > 0)
