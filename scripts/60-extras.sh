@@ -67,6 +67,21 @@ setup_zen() {
     sudo mkdir -p /opt/zen
     sudo cp -r "$(dirname "$binary")/." /opt/zen/
     sudo ln -sf /opt/zen/"$(basename "$binary")" /usr/local/bin/zen
+    # the tarball ships no .desktop; the only one the browser autogenerates is
+    # NoDisplay=true, so it never shows in launchers — write a real one.
+    sudo tee /usr/share/applications/zen.desktop >/dev/null <<'DESKTOP'
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Zen Browser
+Comment=Experience tranquillity while browsing the web
+Exec=/opt/zen/zen %u
+Icon=/opt/zen/browser/chrome/icons/default/default128.png
+Terminal=false
+StartupNotify=true
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+DESKTOP
     rm -rf "$tmp"
     ok "zen installed"
 }
