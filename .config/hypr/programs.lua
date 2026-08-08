@@ -2,7 +2,7 @@
 local programs = {
     terminal    = "kitty",
     fileManager = "dolphin",
-    menu        = " qs ipc call appmenu open"
+    menu        = "qs ipc call appmenu open"
 }
 
 return programs

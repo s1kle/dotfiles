@@ -4,7 +4,7 @@ local mainMod      = "SUPER"
 local launchPrefix = "uwsm app -- "
 
 hl.bind(mainMod .. " + backspace",        hl.dsp.exec_cmd(launchPrefix .. programs.terminal))
-hl.bind(mainMod .. " + t",        hl.dsp.exec_cmd("qs ipc app-menu toggle"))
+hl.bind(mainMod .. " + t",        hl.dsp.exec_cmd("qs ipc thememenu toggle"))
 hl.bind("PRINT", hl.dsp.exec_cmd('grim -g "$(slurp)" - | tee ~/screenshot_$(date +%Y%m%d_%H%M%S).png | wl-copy'))
 hl.bind(mainMod .. " + l", hl.dsp.exec_cmd("pidof hyprlock || hyprlock"))
 hl.bind(mainMod .. " + space",    hl.dsp.exec_cmd(launchPrefix .. programs.menu))
