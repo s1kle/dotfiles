@@ -7,7 +7,10 @@ import QtQuick
 Singleton {
     id: root
 
-    property string currentTheme: Config.theme.name
+    // previewName wins when set (live preview from the theme switcher); empty
+    // falls back to the committed Config.theme.name.
+    property string previewName: ""
+    property string currentTheme: root.previewName !== "" ? root.previewName : Config.theme.name
 
     property color background
     property color surface
