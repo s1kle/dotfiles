@@ -19,7 +19,7 @@ if [[ -z "$DOTFILES_CLONED" ]]; then
     echo "Cloning dotfiles repository..."
     git clone --depth 1 https://github.com/s1kle/dotfiles.git "$TMP_DIR"
     cd "$TMP_DIR"
-    exec bash install.sh "$@"
+    exec bash setup.sh "$@"
     exit
 fi
 
