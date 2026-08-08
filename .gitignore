@@ -5,3 +5,7 @@
 .config/quickshell/config.player.json
 testing/
 /CLAUDE.md
+# design scratch (local only)
+index.html
+style.css
+*.bak
