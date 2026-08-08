@@ -7,15 +7,6 @@ ShellRoot {
     Variants {
         model: Quickshell.screens
 
-        Bar {
-            required property var modelData
-            screen: modelData
-        }
-    }
-
-    Variants {
-        model: Quickshell.screens
-
         Notifications {
             required property var modelData
             screen: modelData
@@ -25,4 +16,6 @@ ShellRoot {
     AppMenu {}
 
     ThemeMenu {}
+
+    TopBar {}
 }
