@@ -17,7 +17,7 @@ Singleton {
         layout: { barHeight: 34, barWidth: 700, radius: 12, padding: 8, margin: 6, gap: 4 },
         shadow: { blur: 16, offsetY: 2, opacity: 0.35 },
         font: { family: "Annotation Mono", sizes: { bar: 12, clock: 14, title: 11 } },
-        weather: { city: "Приморский край, Находка" },
+        weather: { city: "Приморский край, Находка", refreshMinutes: 15 },
         panel: { size: 120 },
         progress: { size: 66, width: 8 },
         slider: { width: 180, height: 78, thickness: 18 },

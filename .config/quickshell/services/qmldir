@@ -11,3 +11,4 @@ singleton Brightness Brightness.qml
 singleton NotificationService NotificationService.qml
 singleton Apps Apps.qml
 singleton Themes Themes.qml
+singleton Weather Weather.qml
