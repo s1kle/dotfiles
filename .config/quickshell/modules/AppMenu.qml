@@ -4,6 +4,7 @@ import QtQuick
 
 import qs.services
 import qs.components
+import "scripts/search.js" as Search
 
 // Radial app launcher: center Search + up to 8 filtered results flung to compass
 // slots with spokes. Up/Down cycle results (from top, looped); Enter launches.
@@ -35,22 +36,7 @@ PanelWindow {
     ]
 
     function filterApps(q: string): var {
-        const s = (q || "").trim().toLowerCase()
-        if (s === "")
-            return []
-        // Rank matches so a prefix ("ze" → "Zen") beats a word-start ("Zeroconf")
-        // beats a bare substring; alphabetical within a rank. filter() copies, so
-        // sort() doesn't reorder the shared Apps.list.
-        const rank = name => {
-            const n = name.toLowerCase()
-            if (n.startsWith(s)) return 0
-            if (n.split(/\s+/).some(w => w.startsWith(s))) return 1
-            return 2
-        }
-        return Apps.list
-            .filter(a => a.name.toLowerCase().includes(s))
-            .sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name))
-            .slice(0, 8)
+        return Search.rank(Apps.list, q, a => a.name)
     }
 
     function open(): void { win.visible = true; search.input.forceActiveFocus() }
