@@ -10,3 +10,4 @@ singleton Config Config.qml
 singleton Brightness Brightness.qml
 singleton NotificationService NotificationService.qml
 singleton Apps Apps.qml
+singleton Themes Themes.qml
