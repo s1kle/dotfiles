@@ -9,9 +9,9 @@ hl.bind("PRINT", hl.dsp.exec_cmd('grim -g "$(slurp)" - | tee ~/screenshot_$(date
 hl.bind(mainMod .. " + l", hl.dsp.exec_cmd("pidof hyprlock || hyprlock"))
 hl.bind(mainMod .. " + space",    hl.dsp.exec_cmd(launchPrefix .. programs.menu))
 hl.bind("CTRL + SHIFT + ESCAPE",        hl.dsp.exec_cmd(launchPrefix .. programs.terminal .. " -e btop"))
-hl.bind(mainMod .. "s",        hl.dsp.exec_cmd('grim -g "$(slurp)" - | tee ~/screenshot_$(date +%Y%m%d_%H%M%S).png | wl-copy'))
-hl.bind(mainMod .. "e",        hl.dsp.exec_cmd(launchPrefix .. programs.fileManager))
-hl.bind(mainMod .. "escape",   hl.dsp.exec_cmd("hyprctl reload"))
+hl.bind(mainMod .. " + s",        hl.dsp.exec_cmd('grim -g "$(slurp)" - | tee ~/screenshot_$(date +%Y%m%d_%H%M%S).png | wl-copy'))
+hl.bind(mainMod .. " + e",        hl.dsp.exec_cmd(launchPrefix .. programs.fileManager))
+hl.bind(mainMod .. " + escape",   hl.dsp.exec_cmd("hyprctl reload"))
 
 hl.bind(mainMod .. " + c",                hl.dsp.window.close())
 hl.bind(mainMod .. " + q",                hl.dsp.window.close())
