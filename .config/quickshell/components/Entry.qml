@@ -14,9 +14,12 @@ Item {
     property var icon: null // freedesktop icon name, or null
     property bool selected: false
 
-    // iconPath(name, true) returns "" when the icon doesn't exist; combined with
-    // the load status this hides broken/missing icons instead of showing them.
-    readonly property bool hasIcon: !!root.icon && iconImg.status === Image.Ready
+    // iconPath(name, true) returns "" when the icon doesn't exist, so this hides
+    // broken/missing icons. Resolve it synchronously (not via Image.Ready): gating
+    // layout on the async decode reflows the row when it finishes, which blinks
+    // long (overflowing) names on first appearance.
+    readonly property string iconSource: root.icon ? Quickshell.iconPath(root.icon, true) : ""
+    readonly property bool hasIcon: root.iconSource !== ""
 
     implicitWidth: 150
     implicitHeight: 36
@@ -53,7 +56,7 @@ Item {
             visible: root.hasIcon
             asynchronous: true
             sourceSize: Qt.size(20, 20)
-            source: root.icon ? Quickshell.iconPath(root.icon, true) : ""
+            source: root.iconSource
         }
 
         Item {
@@ -71,16 +74,37 @@ Item {
                 font.pixelSize: 13
                 x: 0
 
-                readonly property bool overflow: implicitWidth > nameClip.width
-                readonly property real scrollDur: Math.max(1, implicitWidth - nameClip.width) * 25
+                // span = clip width - text width, negative when the text overflows.
+                // implicitWidth settles a frame or two after the name changes (font
+                // /layout metrics), so span is the single source of truth and any
+                // change to it restarts the marquee below.
+                readonly property real span: nameClip.width - implicitWidth
+                readonly property bool overflow: span < 0
+                readonly property real scrollDur: Math.max(1, -span) * 25
 
-                SequentialAnimation on x {
-                    running: label.overflow
+                // Delegates are reused as results change, and implicitWidth settles
+                // late. Fully restart the marquee (stop, pin x to 0, start from the
+                // leading pause) on any name or span change: a stale in-flight scroll
+                // is killed, and a width that settles during the pause just restarts
+                // cleanly instead of scrolling to a stale, barely-overflowing offset.
+                function resetMarquee() {
+                    marquee.stop()
+                    x = 0
+                    if (overflow)
+                        marquee.start()
+                }
+                onTextChanged: resetMarquee()
+                onSpanChanged: resetMarquee()
+                Component.onCompleted: resetMarquee()
+
+                SequentialAnimation {
+                    id: marquee
                     loops: Animation.Infinite
+                    PropertyAction { target: label; property: "x"; value: 0 }
                     PauseAnimation { duration: 1200 }
-                    NumberAnimation { from: 0; to: nameClip.width - label.implicitWidth; duration: label.scrollDur; easing.type: Easing.InOutQuad }
+                    NumberAnimation { target: label; property: "x"; from: 0; to: label.span; duration: label.scrollDur; easing.type: Easing.InOutQuad }
                     PauseAnimation { duration: 1200 }
-                    NumberAnimation { from: nameClip.width - label.implicitWidth; to: 0; duration: label.scrollDur; easing.type: Easing.InOutQuad }
+                    NumberAnimation { target: label; property: "x"; from: label.span; to: 0; duration: label.scrollDur; easing.type: Easing.InOutQuad }
                 }
             }
         }

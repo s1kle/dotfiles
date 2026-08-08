@@ -38,7 +38,19 @@ PanelWindow {
         const s = (q || "").trim().toLowerCase()
         if (s === "")
             return []
-        return Apps.list.filter(a => a.name.toLowerCase().includes(s)).slice(0, 8)
+        // Rank matches so a prefix ("ze" → "Zen") beats a word-start ("Zeroconf")
+        // beats a bare substring; alphabetical within a rank. filter() copies, so
+        // sort() doesn't reorder the shared Apps.list.
+        const rank = name => {
+            const n = name.toLowerCase()
+            if (n.startsWith(s)) return 0
+            if (n.split(/\s+/).some(w => w.startsWith(s))) return 1
+            return 2
+        }
+        return Apps.list
+            .filter(a => a.name.toLowerCase().includes(s))
+            .sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name))
+            .slice(0, 8)
     }
 
     function open(): void { win.visible = true; search.input.forceActiveFocus() }
