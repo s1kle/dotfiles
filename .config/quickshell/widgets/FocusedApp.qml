@@ -9,6 +9,7 @@ Row {
 
     property string icon: ""
     property string name: ""
+    property int maxNameWidth: 220 // cap so a long window title can't blow up the pill
 
     spacing: 6
 
@@ -29,5 +30,7 @@ Row {
         color: Theme.text
         font.family: Config.font.family
         font.pixelSize: 12
+        elide: Text.ElideRight
+        width: Math.min(implicitWidth, root.maxNameWidth)
     }
 }

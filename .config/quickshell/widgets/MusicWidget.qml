@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Effects
+import Quickshell.Widgets
 
 import qs.services
 import qs.components
@@ -27,15 +27,18 @@ Row {
 
     spacing: 10
 
-    // cover: gradient fallback, real art rounded on top when available
-    Item {
+    // cover: gradient fallback, real art clipped to a rounded rect on top.
+    // ClippingRectangle gives an antialiased rounded clip (a MultiEffect mask
+    // pixelated the edges).
+    ClippingRectangle {
         anchors.verticalCenter: parent.verticalCenter
         width: 48
         height: 48
+        radius: 10
+        color: "transparent"
 
         Rectangle {
             anchors.fill: parent
-            radius: 10
             visible: !art.visible
             gradient: Gradient {
                 GradientStop { position: 0; color: Theme.accent }
@@ -48,18 +51,6 @@ Row {
             source: root.coverUrl
             fillMode: Image.PreserveAspectCrop
             visible: root.coverUrl !== "" && status === Image.Ready
-            layer.enabled: true
-            layer.effect: MultiEffect {
-                maskEnabled: true
-                maskSource: artMask
-            }
-        }
-        Item {
-            id: artMask
-            anchors.fill: parent
-            layer.enabled: true
-            visible: false
-            Rectangle { anchors.fill: parent; radius: 10 }
         }
     }
 

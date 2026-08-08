@@ -1,11 +1,10 @@
 import QtQuick
-import QtQuick.Effects
 
 import qs.services
 
 // Dumb: morning / now / evening forecast. Each slot is ({ temp, icon }) where
-// icon is a resolved SVG source URL, or null to hide the slot. Dim sides, bright
-// center. The SVG is tinted to a Theme token via MultiEffect.
+// icon is a resolved SVG source URL, or null to hide the slot. Icons keep their
+// own natural colors (theme-independent); side slots are dimmed with opacity.
 Row {
     id: root
 
@@ -29,32 +28,22 @@ Row {
             readonly property bool center: modelData.center
 
             visible: d !== null
+            opacity: slot.center ? 1 : 0.7
             spacing: 2
 
-            Item {
+            Image {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: slot.center ? 22 : 15
                 height: width
-
-                Image {
-                    id: img
-                    anchors.fill: parent
-                    visible: false
-                    sourceSize: Qt.size(width, height)
-                    source: slot.d ? slot.d.icon : ""
-                }
-                MultiEffect {
-                    anchors.fill: parent
-                    source: img
-                    colorization: 1
-                    colorizationColor: slot.center ? Theme.text : Theme.textDim
-                }
+                sourceSize: Qt.size(width, height)
+                fillMode: Image.PreserveAspectFit
+                source: slot.d ? slot.d.icon : ""
             }
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: slot.d ? (slot.d.temp + "°") : ""
-                color: slot.center ? Theme.text : Theme.textDim
+                color: Theme.text
                 font.family: Config.font.family
                 font.pixelSize: slot.center ? 13 : 11
             }

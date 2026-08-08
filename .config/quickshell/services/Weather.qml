@@ -44,9 +44,11 @@ Singleton {
             return
         }
         const q = encodeURIComponent(W.cityQuery(city))
-        root.get(`https://geocoding-api.open-meteo.com/v1/search?name=${q}&count=1`, res => {
-            const r = res && res.results && res.results[0]
-            if (!r) { root.error = "geocode: no result for " + city; return }
+        root.get(`https://geocoding-api.open-meteo.com/v1/search?name=${q}&count=5`, res => {
+            const list = (res && res.results) || []
+            if (list.length === 0) { root.error = "geocode: no result for " + city; return }
+            // ambiguous names (e.g. two "Nakhodka"s) -> pick the most populous.
+            const r = list.reduce((a, b) => ((b.population || 0) > (a.population || 0) ? b : a))
             root.lat = r.latitude
             root.lon = r.longitude
             root.geocodedFor = city
@@ -60,13 +62,15 @@ Singleton {
         root.get(url, res => {
             const h = res && res.hourly
             if (!h || !h.time) { root.error = "forecast: empty"; return }
-            const s = W.sampleForecast(h.time, h.temperature_2m, h.weathercode, new Date().getHours())
+            // "now" hour in the LOCATION's local time (not the VM's timezone)
+            const offset = res.utc_offset_seconds || 0
+            const nowHour = new Date(Date.now() + offset * 1000).getUTCHours()
+            const s = W.sampleForecast(h.time, h.temperature_2m, h.weathercode, nowHour)
             root.morning = s.morning
             root.now = s.now
             root.evening = s.evening
             root.error = ""
             root.ready = true
-            console.warn("WX", JSON.stringify({ error: root.error, now: root.now }))
         })
     }
 
