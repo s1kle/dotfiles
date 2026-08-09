@@ -10,7 +10,7 @@ import qs.services
 RailTile {
     id: root
 
-    property string glyph: ""
+    property string iconName: ""
     property string label: ""
     property string detail: ""
     property real value: 0
@@ -32,12 +32,11 @@ RailTile {
         onActivated: root.activated()
         onToggled: root.toggled()
 
-        Text {
+        Icon {
             anchors.centerIn: parent
-            text: root.glyph
+            name: root.iconName
+            size: 20
             color: root.danger && root.hovered ? Theme.background : Theme.text
-            font.family: Config.font.family
-            font.pixelSize: 20
         }
     }
 
