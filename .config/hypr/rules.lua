@@ -37,6 +37,14 @@ hl.layer_rule({
     ignore_alpha = 0.1,
 })
 
+hl.window_rule({
+    -- let kitty own its translucency via background_opacity (crisp text over
+    -- the compositor blur) instead of the global active/inactive_opacity dim.
+    name    = "kitty-opacity",
+    match   = { class = "kitty" },
+    opacity = "1.0 override 1.0 override",
+})
+
 -- local MONITOR1 = "eDP-1"
 local MONITOR1 = "Virtual-1"
 local MONITOR2 = "HDMI-A-1"
