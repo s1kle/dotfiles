@@ -30,4 +30,10 @@ setup_remove() {
     else
         warn "xdg-mime not found; skipped setting default file manager"
     fi
+
+    # Point nautilus-open-any-terminal's "Open Terminal Here" at kitty.
+    if gsettings list-schemas 2>/dev/null | grep -q nautilus-open-any-terminal; then
+        gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal kitty
+        ok "Nautilus 'Open Terminal Here' set to kitty"
+    fi
 }

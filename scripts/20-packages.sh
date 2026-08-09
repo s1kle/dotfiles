@@ -20,12 +20,18 @@ PACMAN_PACKAGES=(
     mpv
     yay
     nautilus
+    gvfs               # trash, mounting drives, network shares
+    file-roller        # archive extract/create integration
+    tumbler            # thumbnailing service
+    ffmpegthumbnailer  # video thumbnails for tumbler
+    nautilus-python    # base for python nautilus extensions
 )
 
 AUR_PACKAGES=(
     hyprqt6engine
     hyprmod
     linux-wallpaperengine-git
+    nautilus-open-any-terminal  # "Open Terminal Here" -> kitty
 )
 
 setup_pacman_packages() {
