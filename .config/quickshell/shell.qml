@@ -38,9 +38,19 @@ ShellRoot {
 
     Process { id: kittyTheme }
 
+    // Apply the committed theme's variant (dark/light) system-wide (GTK/Qt via
+    // the desktop portal). Commit only -- not preview, which would thrash every
+    // app's colour scheme on hover.
+    Process { id: variantProc; command: ["sh", "-c", "~/.config/hypr/scripts/theme-variant.sh"] }
+
     Connections {
         target: Config
-        function onThemeChanged() { previewDebounce.stop(); root.syncKitty() }
+        function onThemeChanged() {
+            previewDebounce.stop()
+            root.syncKitty()
+            variantProc.running = false
+            variantProc.running = true
+        }
     }
     Connections {
         target: Theme
