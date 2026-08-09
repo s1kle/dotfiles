@@ -23,6 +23,33 @@ Singleton {
         slider: { width: 180, height: 78, thickness: 18 },
         widgets: { Music: true, Weather: true, Workspaces: true, Settings: true, Battery: true, Bluetooth: true },
         topbar: { collapseDelay: 0 },
+        sidebar: {
+            enabled: true,
+            width: 210,
+            trigger: 100,
+            tileSize: 42,
+            gap: 6,
+            columns: 4,
+            scrollStep: 0.05,
+            collapseDelay: 250,
+            items: [
+                { id: "clock",      size: "wide" },
+                { id: "workspaces", size: "wide" },
+                { type: "divider" },
+                { id: "music",      size: "wide" },
+                { id: "weather",    size: "wide" },
+                { type: "divider" },
+                { id: "volume", size: "small" }, { id: "brightness", size: "small" },
+                { id: "mic",    size: "small" }, { id: "network",    size: "small" },
+                { id: "bluetooth", size: "small" }, { id: "notifications", size: "small" },
+                { type: "divider" },
+                { id: "cpu",  size: "small" }, { id: "mem", size: "small" },
+                { id: "disk", size: "small" }, { id: "download", size: "small" },
+                { id: "upload", size: "small" },
+                { type: "divider" },
+                { id: "battery", size: "big" }, { id: "power", size: "big" }
+            ]
+        },
     })
 
     property var theme: defaults.theme
@@ -35,6 +62,7 @@ Singleton {
     property var slider: defaults.slider
     property var widgets: defaults.widgets
     property var topbar: defaults.topbar
+    property var sidebar: defaults.sidebar
 
     property var baseJson: null // last-good parsed base config
     property var hostJson: null // last-good parsed host config
@@ -94,6 +122,7 @@ Singleton {
         root.slider = merged.slider
         root.widgets = merged.widgets
         root.topbar = merged.topbar
+        root.sidebar = merged.sidebar
         root.valid = true
         root.warnedInvalid = false
     }
