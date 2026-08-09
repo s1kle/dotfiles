@@ -25,9 +25,9 @@ PanelWindow {
     // to render without clipping at the window edge.
     readonly property int flyoutSpace: 360
     implicitWidth: Config.sidebar.width + flyoutSpace
-    exclusiveZone: 0
-    // ignore other surfaces' exclusive zones (e.g. the TopBar) so the rail spans
-    // from the very top of the screen, not below the TopBar's reserved strip.
+    // Ignore other surfaces' exclusive zones (e.g. the TopBar) so the rail spans
+    // from the very top of the screen. NB: setting exclusiveZone here would force
+    // the mode back to Normal, so we don't — Ignore reserves nothing anyway.
     exclusionMode: ExclusionMode.Ignore
 
     // grab keyboard only while open, so normal typing isn't intercepted.
