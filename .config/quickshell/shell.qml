@@ -38,10 +38,11 @@ ShellRoot {
 
     Process { id: kittyTheme }
 
-    // Apply the committed theme's variant (dark/light) system-wide (GTK/Qt via
-    // the desktop portal). Commit only -- not preview, which would thrash every
-    // app's colour scheme on hover.
+    // Commit-only side effects (not preview, which would thrash every app):
+    //  - variantProc: light/dark system-wide via the portal (live for GTK4/libadwaita).
+    //  - gtkPalette:  exact palette into ~/.config/gtk-4.0/gtk.css (applies on app restart).
     Process { id: variantProc; command: ["sh", "-c", "~/.config/hypr/scripts/theme-variant.sh"] }
+    Process { id: gtkPalette;  command: ["sh", "-c", "python3 ~/.config/hypr/scripts/gtk-palette.py"] }
 
     Connections {
         target: Config
@@ -50,6 +51,8 @@ ShellRoot {
             root.syncKitty()
             variantProc.running = false
             variantProc.running = true
+            gtkPalette.running = false
+            gtkPalette.running = true
         }
     }
     Connections {
