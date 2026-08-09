@@ -263,7 +263,7 @@ PanelWindow {
                     case "mic": return (Audio.sourceMuted || Audio.sourceVolume <= 0) ? "mic-off" : "mic"
                     case "network": return Network.wifiEnabled ? "wifi" : "wifi-off"
                     case "bluetooth": return Bluetooth.enabled ? "bluetooth" : "bluetooth-off"
-                    case "brightness": return "brightness"
+                    case "brightness": return Brightness.value <= 0 ? "brightness-off" : "brightness"
                     case "notifications": return "bell"
                     case "power": return "power"
                 }
