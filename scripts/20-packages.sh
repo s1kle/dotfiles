@@ -19,6 +19,7 @@ PACMAN_PACKAGES=(
     hypridle
     mpv
     yay
+    nautilus
 )
 
 AUR_PACKAGES=(

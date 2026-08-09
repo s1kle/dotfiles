@@ -1,0 +1,33 @@
+# 25-remove.sh — remove unwanted default packages and set app defaults.
+#
+# Some packages ship with the base OS install that we don't want (e.g. Dolphin,
+# a KDE app that ignores the freedesktop color-scheme so it can't follow the
+# light/dark theme switch). We drop those and make Nautilus the file manager,
+# which is libadwaita and does follow the variant.
+
+# Removed if present (safe to list packages that may not be installed).
+REMOVE_PACKAGES=(
+    dolphin
+)
+
+setup_remove() {
+    info "Removing unwanted default packages"
+    local pkg present=()
+    for pkg in "${REMOVE_PACKAGES[@]}"; do
+        pacman -Qq "$pkg" &>/dev/null && present+=("$pkg")
+    done
+    if ((${#present[@]})); then
+        sudo pacman -Rns --noconfirm "${present[@]}"
+        ok "Removed: ${present[*]}"
+    else
+        warn "No listed packages present to remove"
+    fi
+
+    # Nautilus as the default file manager (replaces Dolphin for opening folders).
+    if command -v xdg-mime &>/dev/null; then
+        xdg-mime default org.gnome.Nautilus.desktop inode/directory
+        ok "Default file manager set to Nautilus"
+    else
+        warn "xdg-mime not found; skipped setting default file manager"
+    fi
+}

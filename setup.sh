@@ -35,6 +35,7 @@ STEPS=(
     "mirrors|setup_mirrors|Refresh pacman mirrors (reflector)"
     "update|setup_update|Update the system (pacman -Syyu)"
     "packages|setup_packages|Install pacman + AUR packages"
+    "remove|setup_remove|Remove unwanted defaults (dolphin) and set Nautilus as default file manager"
     "shell|setup_shell|Set up zsh and oh-my-zsh"
     "config|setup_config|Copy dotfiles .config (hypr, kitty, quickshell, …) into ~/.config"
     "fonts|setup_fonts|Install the AnnotationMono font"
