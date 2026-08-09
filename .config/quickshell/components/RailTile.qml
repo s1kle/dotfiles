@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import Quickshell.Widgets
 
 import qs.services
 
@@ -46,16 +47,20 @@ Item {
         }
     }
 
-    // value fill, bottom-up, shown on hover (scrollable tiles). A rounded pill
-    // (same radius all round) that grows upward — rounded top and bottom, so the
-    // shape stays consistent at every level.
-    Rectangle {
-        id: valueFill
+    // value fill, bottom-up, shown on hover (scrollable tiles). A plain rect
+    // clipped to the card's rounded shape, so no colour ever spills outside the
+    // tile — the level is a clean flat line, bottom corners follow the card.
+    ClippingRectangle {
+        anchors.fill: card
+        radius: card.radius
+        color: "transparent"
         visible: root.fill >= 0 && hover.hovered
-        anchors { left: card.left; right: card.right; bottom: card.bottom }
-        height: card.height * Math.max(0, Math.min(1, root.fill))
-        color: Theme.accent
-        radius: Config.layout.radius
+
+        Rectangle {
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: parent.height * Math.max(0, Math.min(1, root.fill))
+            color: Theme.accent
+        }
     }
 
     Item {
