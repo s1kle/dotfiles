@@ -46,16 +46,16 @@ Item {
         }
     }
 
-    // value fill, bottom-up, shown on hover (scrollable tiles). Bottom corners
-    // match the card radius; top is flat so the level line is clear.
+    // value fill, bottom-up, shown on hover (scrollable tiles). A rounded pill
+    // (same radius all round) that grows upward — rounded top and bottom, so the
+    // shape stays consistent at every level.
     Rectangle {
         id: valueFill
         visible: root.fill >= 0 && hover.hovered
         anchors { left: card.left; right: card.right; bottom: card.bottom }
         height: card.height * Math.max(0, Math.min(1, root.fill))
         color: Theme.accent
-        bottomLeftRadius: Config.layout.radius
-        bottomRightRadius: Config.layout.radius
+        radius: Config.layout.radius
     }
 
     Item {

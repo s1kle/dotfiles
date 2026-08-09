@@ -21,7 +21,10 @@ PanelWindow {
     visible: Config.sidebar.enabled
     color: "transparent"
     anchors { top: true; right: true; bottom: true }
-    implicitWidth: Config.sidebar.width
+    // rail width + a little transparent room on the left so the tiles' drop
+    // shadow (offset/blur to the left) isn't clipped at the window edge.
+    readonly property int shadowMargin: 40
+    implicitWidth: Config.sidebar.width + shadowMargin
     // Ignore other surfaces' exclusive zones (e.g. the TopBar) so the rail spans
     // from the very top of the screen. NB: setting exclusiveZone here would force
     // the mode back to Normal, so we don't — Ignore reserves nothing anyway.
