@@ -22,9 +22,8 @@ Item {
     function stepUp(): void { if (root.scrollable) root.moved(Math.min(1, root.value + root.step)) }
     function stepDown(): void { if (root.scrollable) root.moved(Math.max(0, root.value - root.step)) }
 
-    implicitWidth: slot.childrenRect.width
-    implicitHeight: slot.childrenRect.height
-
+    // sized by the consumer (anchors.fill); no implicit size so a fills-parent
+    // slot can't feed back into it as a binding loop.
     Item { id: slot; anchors.fill: parent }
 
     WheelHandler {

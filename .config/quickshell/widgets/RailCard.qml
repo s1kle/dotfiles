@@ -8,4 +8,5 @@ import qs.components
 // content via RailTile's implicitHeight rule.
 RailTile {
     hoverRecolor: false
+    fitContent: true
 }

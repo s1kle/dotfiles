@@ -15,12 +15,13 @@ Item {
     property bool selected: false
     property bool danger: false
     property bool hoverRecolor: true
+    property bool fitContent: false // true: grow to fit content (wide cards)
     readonly property alias hovered: hover.hovered
     default property alias content: body.data
 
     implicitWidth: root.size
-    // square by default; grows to fit taller content (wide cards)
-    implicitHeight: Math.max(root.size, body.height + 2 * root.padding)
+    // square by default; cards grow to fit their content
+    implicitHeight: root.fitContent ? Math.max(root.size, body.height + 2 * root.padding) : root.size
 
     Rectangle {
         id: card
@@ -47,8 +48,10 @@ Item {
     Item {
         id: body
         anchors.centerIn: card
-        width: childrenRect.width
-        height: childrenRect.height
+        // buttons/gauges fill the whole tile (full click/scroll target); cards
+        // shrink to their content so the tile can grow around it.
+        width: root.fitContent ? childrenRect.width : card.width
+        height: root.fitContent ? childrenRect.height : card.height
     }
 
     HoverHandler { id: hover }
