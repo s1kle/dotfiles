@@ -23,6 +23,8 @@ ShellRoot {
 
     TopBar {}
 
+    Sidebar {}
+
     // Keep kitty's colours in sync with quickshell's theme. The committed theme
     // (Config) applies immediately; the ThemeMenu hover-preview (Theme.previewName)
     // applies debounced so rapid hovering coalesces to the theme you pause on, and
