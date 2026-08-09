@@ -48,9 +48,10 @@ Item {
     Item {
         id: body
         anchors.centerIn: card
-        // buttons/gauges fill the whole tile (full click/scroll target); cards
-        // shrink to their content so the tile can grow around it.
-        width: root.fitContent ? childrenRect.width : card.width
+        // always full tile width (so wide cards can space content across it and
+        // buttons get a full click/scroll target); cards fit their content
+        // height so the tile grows vertically around it.
+        width: card.width
         height: root.fitContent ? childrenRect.height : card.height
     }
 
