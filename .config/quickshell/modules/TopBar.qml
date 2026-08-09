@@ -56,6 +56,53 @@ PanelWindow {
         return s ? ({ temp: s.temp, icon: Quickshell.shellPath("assets/weather/" + Weather.iconFor(s.code) + ".svg") }) : null
     }
 
+    function topWidget(id) {
+        switch (id) {
+            case "clock":   return clockTC
+            case "weather": return weatherTC
+            case "music":   return musicTC
+            default:
+                console.warn("TopBar: unknown widget", id)
+                return null
+        }
+    }
+
+    Component {
+        id: clockTC
+        ClockWidget { time: Time.clockTime; date: Time.longDate }
+    }
+
+    Component {
+        id: weatherTC
+        WeatherWidget {
+            morning: win.weatherSlot(Weather.morning)
+            now: win.weatherSlot(Weather.now)
+            evening: win.weatherSlot(Weather.evening)
+        }
+    }
+
+    Component {
+        id: musicTC
+        MusicWidget {
+            coverUrl: Mpris.activePlayer ? Mpris.activePlayer.trackArtUrl : ""
+            track: Mpris.activePlayer ? Mpris.activePlayer.trackTitle : ""
+            artist: Mpris.activePlayer ? Mpris.activePlayer.trackArtist : ""
+            playing: Mpris.isPlaying
+            canPrev: Mpris.canGoPrevious
+            canNext: Mpris.canGoNext
+            canSeek: Mpris.activePlayer ? Mpris.activePlayer.canSeek : false
+            position: win.musicPos
+            length: Mpris.activePlayer ? Mpris.activePlayer.length : 0
+            onPrev: Mpris.previous()
+            onNext: Mpris.next()
+            onPlayPause: Mpris.togglePlaying()
+            onSeek: frac => {
+                const p = Mpris.activePlayer
+                if (p && p.canSeek) { p.position = frac * p.length; win.musicPos = frac * p.length }
+            }
+        }
+    }
+
     // fixed invisible approach trigger centered on the collapsed pill: a cursor
     // thrown into this patch (overshooting the small pill, or landing beside it)
     // expands the island. The pill's own hover keeps it open once expanded, so
@@ -125,7 +172,8 @@ PanelWindow {
             }
         }
 
-        // expanded: clock | weather | music
+        // expanded: config-driven rack (Config.topbar.widgets, in order) with
+        // separators; `music` auto-hides when there's no player.
         RowLayout {
             id: rack
             anchors.centerIn: parent
@@ -137,37 +185,25 @@ PanelWindow {
             opacity: win.progress * win.progress
             enabled: win.expanded // no click/seek on the clipped rack while collapsed
 
-            ClockWidget {
-                Layout.alignment: Qt.AlignVCenter
-                time: Time.clockTime
-                date: Time.longDate
-            }
-            Rectangle { Layout.alignment: Qt.AlignVCenter; Layout.preferredWidth: 1; Layout.preferredHeight: 56; color: Theme.primary }
-            WeatherWidget {
-                Layout.alignment: Qt.AlignVCenter
-                morning: win.weatherSlot(Weather.morning)
-                now: win.weatherSlot(Weather.now)
-                evening: win.weatherSlot(Weather.evening)
-            }
-            Rectangle { visible: win.hasMusic; Layout.alignment: Qt.AlignVCenter; Layout.preferredWidth: 1; Layout.preferredHeight: 56; color: Theme.primary }
-            MusicWidget {
-                visible: win.hasMusic
-                Layout.alignment: Qt.AlignVCenter
-                coverUrl: Mpris.activePlayer ? Mpris.activePlayer.trackArtUrl : ""
-                track: Mpris.activePlayer ? Mpris.activePlayer.trackTitle : ""
-                artist: Mpris.activePlayer ? Mpris.activePlayer.trackArtist : ""
-                playing: Mpris.isPlaying
-                canPrev: Mpris.canGoPrevious
-                canNext: Mpris.canGoNext
-                canSeek: Mpris.activePlayer ? Mpris.activePlayer.canSeek : false
-                position: win.musicPos
-                length: Mpris.activePlayer ? Mpris.activePlayer.length : 0
-                onPrev: Mpris.previous()
-                onNext: Mpris.next()
-                onPlayPause: Mpris.togglePlaying()
-                onSeek: frac => {
-                    const p = Mpris.activePlayer
-                    if (p && p.canSeek) { p.position = frac * p.length; win.musicPos = frac * p.length }
+            Repeater {
+                model: Config.topbar.widgets
+                delegate: RowLayout {
+                    required property int index
+                    required property var modelData
+                    visible: modelData === "music" ? win.hasMusic : true
+                    spacing: 18
+
+                    Rectangle {
+                        visible: index > 0
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.preferredWidth: 1
+                        Layout.preferredHeight: 56
+                        color: Theme.primary
+                    }
+                    Loader {
+                        Layout.alignment: Qt.AlignVCenter
+                        sourceComponent: win.topWidget(modelData)
+                    }
                 }
             }
         }

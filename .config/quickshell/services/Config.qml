@@ -22,7 +22,8 @@ Singleton {
         progress: { size: 66, width: 8 },
         slider: { width: 180, height: 78, thickness: 18 },
         widgets: { Music: true, Weather: true, Workspaces: true, Settings: true, Battery: true, Bluetooth: true },
-        topbar: { collapseDelay: 0 },
+        // TopBar expanded rack, in order. `music` auto-hides when no player.
+        topbar: { collapseDelay: 0, widgets: ["clock", "weather", "music"] },
         sidebar: {
             enabled: true,
             width: 210,
@@ -32,22 +33,21 @@ Singleton {
             columns: 4,
             scrollStep: 0.05,
             collapseDelay: 250,
+            // base set for every host; hosts (e.g. config.player.json) replace this
+            // whole list to add hardware items like wifi/bluetooth/battery.
             items: [
                 { id: "clock",      size: "wide" },
                 { id: "workspaces", size: "wide" },
-                { type: "divider" },
-                { id: "music",      size: "wide" },
                 { id: "weather",    size: "wide" },
                 { type: "divider" },
                 { id: "volume", size: "small" }, { id: "brightness", size: "small" },
-                { id: "mic",    size: "small" }, { id: "network",    size: "small" },
-                { id: "bluetooth", size: "small" }, { id: "notifications", size: "small" },
+                { id: "mic",    size: "small" }, { id: "notifications", size: "small" },
                 { type: "divider" },
                 { id: "cpu",  size: "small" }, { id: "mem", size: "small" },
                 { id: "disk", size: "small" }, { id: "download", size: "small" },
                 { id: "upload", size: "small" },
                 { type: "spacer" },
-                { id: "battery", size: "big" }, { id: "power", size: "big" }
+                { id: "power", size: "wide" }
             ]
         },
     })
@@ -82,9 +82,12 @@ Singleton {
     }
 
     // Merge driven by base keys: override keys absent from base are ignored,
-    // objects recurse, scalars are replaced wholesale.
+    // objects recurse, scalars are replaced wholesale. Arrays replace wholesale
+    // (so a host can supply a completely different widget list, not an
+    // index-by-index merge).
     function deepMerge(base: var, override: var): var {
         if (override === undefined || override === null) return base
+        if (Array.isArray(base) || Array.isArray(override)) return override
         if (typeof base !== "object" || typeof override !== "object") return override
         const out = {}
         for (const key of Object.keys(base)) {
