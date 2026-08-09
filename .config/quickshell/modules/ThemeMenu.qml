@@ -1,7 +1,6 @@
 import Quickshell
 import Quickshell.Io
 import QtQuick
-import QtQuick.Window
 
 import qs.services
 import qs.components
@@ -21,6 +20,11 @@ PanelWindow {
 
     property var results: win.filterThemes(search.text)
     property int selected: 0
+    // false: entries collapsed at center (behind the search); true: fanned to
+    // their radial slots. Set true a tick after open so the window has sized and
+    // the entries snap to center first, then animate outward (never in from the
+    // window edge).
+    property bool fanned: false
 
     readonly property int ringR: 240
     readonly property int ringD: 170
@@ -72,6 +76,8 @@ PanelWindow {
 
     function open(): void {
         win.visible = true
+        win.fanned = false
+        fanTimer.restart()
         search.text = "@" + win.currentVariant() + " "
         search.input.forceActiveFocus()
         search.input.cursorPosition = search.text.length
@@ -79,7 +85,9 @@ PanelWindow {
     // hide without touching the preview — used after a commit to keep the chosen
     // theme showing while Config's write + hot-reload lands. visible=false first
     // so the search.text reset below can't retrigger preview().
-    function hide(): void { win.visible = false; search.text = "" }
+    function hide(): void { win.fanned = false; win.visible = false; search.text = "" }
+
+    Timer { id: fanTimer; interval: 32; onTriggered: win.fanned = true }
     // cancel: revert the live preview, then hide.
     function close(): void { Theme.previewName = ""; win.hide() }
     function toggle(): void { win.visible ? win.close() : win.open() }
@@ -164,14 +172,11 @@ PanelWindow {
             readonly property var t: win.results[index] ?? null
             readonly property point off: win.slots[index]
             height: 2
-            width: t ? Math.hypot(off.x, off.y) : 0
+            width: (win.fanned && t) ? Math.hypot(off.x, off.y) : 0
             color: Theme.accentMuted
             antialiasing: true
-            // Screen (not win.width) so entries are placed correctly from creation
-            // — win.width is 0 until the window first maps, which made the entries
-            // animate in from the left edge on first open.
-            x: Screen.width / 2
-            y: Screen.height / 2 - 1
+            x: win.width / 2
+            y: win.height / 2 - 1
             transformOrigin: Item.Left
             rotation: Math.atan2(off.y, off.x) * 180 / Math.PI
             opacity: t ? 1 : 0
@@ -191,12 +196,14 @@ PanelWindow {
             name: t ? t.name : ""
             palette: t ? t.palette : ({})
             selected: index === win.selected && t !== null
-            x: Screen.width / 2 - width / 2 + (t ? win.slots[index].x : 0)
-            y: Screen.height / 2 - height / 2 + (t ? win.slots[index].y : 0)
+            x: win.width / 2 - width / 2 + (win.fanned && t ? win.slots[index].x : 0)
+            y: win.height / 2 - height / 2 + (win.fanned && t ? win.slots[index].y : 0)
             opacity: t ? 1 : 0
             scale: t ? 1 : 0.5
-            Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
-            Behavior on y { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+            // animate only the fan-out; while collapsed the window-size settle
+            // snaps silently so entries never streak in from the edge.
+            Behavior on x { enabled: win.fanned; NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+            Behavior on y { enabled: win.fanned; NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
             Behavior on opacity { NumberAnimation { duration: 200 } }
             Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
         }

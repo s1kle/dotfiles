@@ -84,17 +84,7 @@ PanelWindow {
         }
     }
 
-    onExpandedChanged: if (!win.expanded) { win.selIndex = -1; stub.visible = false }
-
-    // v1 left-click config: a minimal SliderPanel over a dim scrim. Real device/
-    // wifi/bluetooth/power pickers are a deferred follow-up spec.
-    // ponytail: single shared modal stub; build the real per-service pickers later.
-    function openStub(title, value, sink) {
-        stub.title = title
-        stub.value = value
-        stub.sink = sink
-        stub.visible = true
-    }
+    onExpandedChanged: if (!win.expanded) win.selIndex = -1
 
     Item {
         id: triggerZone
@@ -118,7 +108,7 @@ PanelWindow {
         Keys.onPressed: event => {
             const n = win.tiles.length
             if (event.key === Qt.Key_Escape) {
-                if (stub.visible) stub.visible = false; else win.expanded = false
+                win.expanded = false
                 event.accepted = true
             } else if (event.key === Qt.Key_Down) {
                 win.selIndex = Math.min(n - 1, win.selIndex + 1); event.accepted = true
@@ -145,25 +135,6 @@ PanelWindow {
             sourceComponent: railColumnC
         }
 
-        // ── dim scrim + config stub ──
-        Rectangle {
-            id: stub
-            anchors.fill: parent
-            visible: false
-            color: "#99000000"
-            property string title: ""
-            property real value: 0
-            property var sink: null
-
-            MouseArea { anchors.fill: parent; onClicked: stub.visible = false }
-
-            SliderPanel {
-                anchors.centerIn: parent
-                title: stub.title
-                value: stub.value
-                onMoved: v => { stub.value = v; if (stub.sink) stub.sink(v) }
-            }
-        }
     }
 
     Timer { id: collapseTimer; interval: Config.sidebar.collapseDelay; onTriggered: win.expanded = false }
@@ -303,9 +274,6 @@ PanelWindow {
                     if (value > 0) { btn.prevValue = value; btn.applyValue(0) }
                     else btn.applyValue(btn.prevValue > 0 ? btn.prevValue : 0.5)
                 }
-            }
-            onActivated: {
-                if (showSlider) win.openStub(label, value, v => btn.moved(v))
             }
             Component.onCompleted: win.register(btn)
             Component.onDestruction: win.unregister(btn)

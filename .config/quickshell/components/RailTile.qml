@@ -48,10 +48,9 @@ Item {
     Item {
         id: body
         anchors.centerIn: card
-        // always full tile width (so wide cards can space content across it and
-        // buttons get a full click/scroll target); cards fit their content
-        // height so the tile grows vertically around it.
-        width: card.width
+        // cards inset content by `padding` (breathing room from the card edges);
+        // buttons/gauges fill the whole tile so the click/scroll target is full.
+        width: root.fitContent ? card.width - 2 * root.padding : card.width
         height: root.fitContent ? childrenRect.height : card.height
     }
 
