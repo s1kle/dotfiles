@@ -39,6 +39,7 @@ Singleton {
                 { id: "clock",      size: "wide" },
                 { id: "workspaces", size: "wide" },
                 { id: "weather",    size: "wide" },
+                { id: "music",      size: "wide" },
                 { type: "divider" },
                 { id: "volume", size: "small" }, { id: "brightness", size: "small" },
                 { id: "mic",    size: "small" }, { id: "notifications", size: "small" },
