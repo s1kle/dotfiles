@@ -40,4 +40,22 @@ RailTile {
             color: root.danger && root.hovered ? Theme.background : Theme.text
         }
     }
+
+    // contrast copy of the icon, clipped to the value fill (bottom-up), so the
+    // portion the accent fill covers stays legible (background colour over accent).
+    Item {
+        id: iconFillMask
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+        height: parent.height * root.fillLevel
+        clip: true
+        visible: root.scrollable
+
+        Icon {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: iconFillMask.height - root.height / 2 - height / 2
+            name: root.iconName
+            size: 20
+            color: Theme.background
+        }
+    }
 }

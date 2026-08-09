@@ -257,7 +257,18 @@ PanelWindow {
                 else if (cell.id === "brightness") Brightness.set(v)
                 else if (cell.id === "mic") Audio.setSourceVolume(v)
             }
-            iconName: ({ volume: "volume", brightness: "brightness", mic: "mic", network: "wifi", bluetooth: "bluetooth", notifications: "bell", power: "power" })[cell.id] ?? ""
+            iconName: {
+                switch (cell.id) {
+                    case "volume": return (Audio.muted || Audio.volume <= 0) ? "volume-off" : "volume"
+                    case "mic": return (Audio.sourceMuted || Audio.sourceVolume <= 0) ? "mic-off" : "mic"
+                    case "network": return Network.wifiEnabled ? "wifi" : "wifi-off"
+                    case "bluetooth": return Bluetooth.enabled ? "bluetooth" : "bluetooth-off"
+                    case "brightness": return "brightness"
+                    case "notifications": return "bell"
+                    case "power": return "power"
+                }
+                return ""
+            }
             danger: cell.id === "power"
             scrollable: cell.id === "volume" || cell.id === "brightness" || cell.id === "mic"
             selected: win.selIndex >= 0 && win.tiles[win.selIndex] === btn
