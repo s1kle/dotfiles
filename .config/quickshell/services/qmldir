@@ -13,3 +13,4 @@ singleton Apps Apps.qml
 singleton Themes Themes.qml
 singleton Weather Weather.qml
 singleton FocusedWindow FocusedWindow.qml
+singleton Hyprland Hyprland.qml
