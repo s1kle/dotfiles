@@ -46,7 +46,7 @@ Singleton {
                 { id: "cpu",  size: "small" }, { id: "mem", size: "small" },
                 { id: "disk", size: "small" }, { id: "download", size: "small" },
                 { id: "upload", size: "small" },
-                { type: "divider" },
+                { type: "spacer" },
                 { id: "battery", size: "big" }, { id: "power", size: "big" }
             ]
         },

@@ -15,6 +15,7 @@ Singleton {
 
     property int minSlots: 4
     readonly property int focusedId: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
+    readonly property string monitorName: Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
 
     readonly property var workspaces: {
         const existing = {}
