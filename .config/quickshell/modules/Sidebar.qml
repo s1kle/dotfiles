@@ -39,8 +39,9 @@ PanelWindow {
     property real musicPos: 0
     readonly property bool hasMusic: Mpris.activePlayer !== null
 
-    // per-column unit width inside the rail (margins 8 each side).
-    readonly property real railInner: Config.sidebar.width - 16
+    // full rail width per row (no horizontal padding — tiles/cards bleed to the
+    // rail edges); only a vertical margin is applied on the ColumnLayout.
+    readonly property real railInner: Config.sidebar.width
     readonly property real unit: (railInner - (Config.sidebar.columns - 1) * Config.sidebar.gap) / Config.sidebar.columns
 
     // union the edge trigger zone + the rail; the transparent gap passes clicks through.
@@ -132,40 +133,16 @@ PanelWindow {
             }
         }
 
-        ColumnLayout {
+        // Only build the (effect-heavy) tiles while open. Collapsed, the rail is
+        // a bare rectangle off-screen — no MultiEffect/Shape work runs, so the
+        // idle shell stays cheap (this was making ThemeMenu janky). Vertical
+        // margin only; tiles/cards bleed to the rail edges horizontally.
+        Loader {
+            active: win.expanded
             anchors.fill: parent
-            anchors.margins: 8
-            spacing: Config.sidebar.gap
-
-            Repeater {
-                model: Packer.packRows(Config.sidebar.items, Config.sidebar.columns)
-                delegate: Item {
-                    id: rowItem
-                    required property var modelData // { cells: [...] }
-                    readonly property var cells: modelData.cells
-                    readonly property bool isSpacer: cells.length === 1 && cells[0].type === "spacer"
-                    Layout.fillWidth: true
-                    Layout.fillHeight: isSpacer // absorbs slack, pushing later rows down
-                    implicitHeight: isSpacer ? 0 : rowFlow.implicitHeight
-
-                    Row {
-                        id: rowFlow
-                        visible: !rowItem.isSpacer
-                        width: win.railInner
-                        spacing: Config.sidebar.gap
-
-                        Repeater {
-                            model: rowItem.isSpacer ? [] : rowItem.cells
-                            delegate: Loader {
-                                required property var modelData // a cell { id?, type?, size, cols }
-                                readonly property var cell: modelData
-                                width: cell.cols * win.unit + (cell.cols - 1) * Config.sidebar.gap
-                                sourceComponent: win.tileFor(cell)
-                            }
-                        }
-                    }
-                }
-            }
+            anchors.topMargin: 8
+            anchors.bottomMargin: 8
+            sourceComponent: railColumnC
         }
 
         // ── dim scrim + config stub ──
@@ -204,7 +181,47 @@ PanelWindow {
         function onTrackTitleChanged() { win.musicPos = 0 }
     }
 
+    // pause the heavy stats poll while the rail is closed (nothing shows it).
+    Binding { target: SystemUsage; property: "active"; value: win.expanded }
+
     // ── tile components (read `parent.cell` from their Loader) ──
+
+    Component {
+        id: railColumnC
+        ColumnLayout {
+            spacing: Config.sidebar.gap
+
+            Repeater {
+                model: Packer.packRows(Config.sidebar.items, Config.sidebar.columns)
+                delegate: Item {
+                    id: rowItem
+                    required property var modelData // { cells: [...] }
+                    readonly property var cells: modelData.cells
+                    readonly property bool isSpacer: cells.length === 1 && cells[0].type === "spacer"
+                    Layout.fillWidth: true
+                    Layout.fillHeight: isSpacer // absorbs slack, pushing later rows down
+                    implicitHeight: isSpacer ? 0 : rowFlow.implicitHeight
+
+                    Row {
+                        id: rowFlow
+                        visible: !rowItem.isSpacer
+                        width: win.railInner
+                        spacing: Config.sidebar.gap
+
+                        Repeater {
+                            model: rowItem.isSpacer ? [] : rowItem.cells
+                            delegate: Loader {
+                                required property var modelData // a cell { id?, type?, size, cols }
+                                readonly property var cell: modelData
+                                width: cell.cols * win.unit + (cell.cols - 1) * Config.sidebar.gap
+                                sourceComponent: win.tileFor(cell)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     Component {
         id: dividerC
@@ -245,7 +262,14 @@ PanelWindow {
         RailButton {
             id: btn
             property var cell: parent ? parent.cell : ({ cols: 1 })
+            property real prevValue: 0.5 // remembered level for the 0↔previous toggle
             cols: cell.cols
+
+            function applyValue(v) {
+                if (cell.id === "volume") Audio.setVolume(v)
+                else if (cell.id === "brightness") Brightness.set(v)
+                else if (cell.id === "mic") Audio.setSourceVolume(v)
+            }
             iconName: ({ volume: "volume", brightness: "brightness", mic: "mic", network: "wifi", bluetooth: "bluetooth", notifications: "bell", power: "power" })[cell.id] ?? ""
             label: ({ volume: "Vol", brightness: "Bri", mic: "Mic" })[cell.id] ?? ""
             danger: cell.id === "power"
@@ -269,16 +293,16 @@ PanelWindow {
                 }
                 return ""
             }
-            onMoved: v => {
-                if (cell.id === "volume") Audio.setVolume(v)
-                else if (cell.id === "brightness") Brightness.set(v)
-                else if (cell.id === "mic") Audio.setSourceVolume(v)
-            }
+            onMoved: v => btn.applyValue(v)
             onToggled: {
-                if (cell.id === "volume") Audio.toggleMuted()
-                else if (cell.id === "mic") Audio.setSourceVolume(0)
-                else if (cell.id === "network") Network.setWifiEnabled(!Network.wifiEnabled)
+                if (cell.id === "network") Network.setWifiEnabled(!Network.wifiEnabled)
                 else if (cell.id === "bluetooth") Bluetooth.setEnabled(!Bluetooth.enabled)
+                else if (showSlider) {
+                    // 0 (disabled) ↔ previous level. Remember the level on the way
+                    // down so the next right-click restores exactly where it was.
+                    if (value > 0) { btn.prevValue = value; btn.applyValue(0) }
+                    else btn.applyValue(btn.prevValue > 0 ? btn.prevValue : 0.5)
+                }
             }
             onActivated: {
                 if (showSlider) win.openStub(label, value, v => btn.moved(v))
@@ -319,35 +343,32 @@ PanelWindow {
         RailCard {
             property var cell: parent ? parent.cell : ({ cols: 4 })
             cols: cell.cols
-            // dots on the left, focused monitor name on the right (space-between).
-            Item {
-                width: parent.width
-                height: 16
+            // monitor name (caps) then dots, both left-aligned.
+            Row {
+                spacing: 12
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Hyprland.monitorName.toUpperCase()
+                    color: Theme.textDim
+                    font.family: Config.font.family
+                    font.pixelSize: 12
+                }
 
                 Row {
-                    anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 10
+                    spacing: 12
                     Repeater {
                         model: Hyprland.workspaces
                         delegate: Rectangle {
                             required property var modelData
-                            width: 14; height: 14; radius: 7
+                            width: 18; height: 18; radius: 9
                             color: modelData.active ? Theme.accent : (modelData.occupied ? Theme.textDim : "transparent")
                             border.width: modelData.occupied || modelData.active ? 0 : 2
                             border.color: Theme.accentMuted
                             TapHandler { onTapped: Hyprland.switchTo(modelData.id) }
                         }
                     }
-                }
-
-                Text {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Hyprland.monitorName
-                    color: Theme.textDim
-                    font.family: Config.font.family
-                    font.pixelSize: 11
                 }
             }
         }
