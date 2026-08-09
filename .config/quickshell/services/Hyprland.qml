@@ -2,6 +2,7 @@ pragma Singleton
 
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 import QtQuick
 
 // Normalised Hyprland workspace list for the sidebar dots. Hyprland only tracks
@@ -28,7 +29,12 @@ Singleton {
         return out
     }
 
+    // hyprctl (not Hyprland.dispatch): the latter is evaluated as Lua on some
+    // Hyprland builds, mangling "workspace 2"; hyprctl's dispatch path is
+    // version-agnostic across the VM and the laptop.
     function switchTo(id: int): void {
-        Hyprland.dispatch("workspace " + id)
+        switchProc.exec(["hyprctl", "dispatch", "workspace", String(id)])
     }
+
+    Process { id: switchProc }
 }
