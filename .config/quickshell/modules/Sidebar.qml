@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
 import QtQuick
@@ -166,6 +167,11 @@ PanelWindow {
     // pause the heavy stats poll while the rail is closed (nothing shows it).
     Binding { target: SystemUsage; property: "active"; value: win.expanded }
 
+    // short "volume change" blip so you hear the new level while adjusting.
+    // Needs libcanberra (canberra-gtk-play); fails silently if absent.
+    Process { id: volumeSound }
+    function volumeBlip() { volumeSound.exec(["canberra-gtk-play", "-i", "audio-volume-change"]) }
+
     // ── tile components (read `parent.cell` from their Loader) ──
 
     Component {
@@ -247,7 +253,7 @@ PanelWindow {
             cols: cell.cols
 
             function applyValue(v) {
-                if (cell.id === "volume") Audio.setVolume(v)
+                if (cell.id === "volume") { Audio.setVolume(v); win.volumeBlip() }
                 else if (cell.id === "brightness") Brightness.set(v)
                 else if (cell.id === "mic") Audio.setSourceVolume(v)
             }
@@ -267,7 +273,7 @@ PanelWindow {
             onToggled: {
                 if (cell.id === "network") Network.setWifiEnabled(!Network.wifiEnabled)
                 else if (cell.id === "bluetooth") Bluetooth.setEnabled(!Bluetooth.enabled)
-                else if (showSlider) {
+                else if (scrollable) {
                     // 0 (disabled) ↔ previous level. Remember the level on the way
                     // down so the next right-click restores exactly where it was.
                     if (value > 0) { btn.prevValue = value; btn.applyValue(0) }

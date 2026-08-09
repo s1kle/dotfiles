@@ -26,12 +26,19 @@ Item {
     // slot can't feed back into it as a binding loop.
     Item { id: slot; anchors.fill: parent }
 
+    // accumulate the (possibly tiny, high-frequency touchpad) wheel delta and
+    // only step once it crosses Config.sidebar.scrollThreshold — a mouse notch
+    // (~120) is one step, a touchpad needs to accrue the same. scrollInvert
+    // mirrors the direction.
+    property real _accum: 0
     WheelHandler {
         enabled: root.scrollable
         acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
         onWheel: event => {
-            if (event.angleDelta.y > 0) root.stepUp()
-            else if (event.angleDelta.y < 0) root.stepDown()
+            const threshold = Math.max(1, Config.sidebar.scrollThreshold)
+            root._accum += (Config.sidebar.scrollInvert ? -1 : 1) * event.angleDelta.y
+            while (root._accum >= threshold) { root._accum -= threshold; root.stepUp() }
+            while (root._accum <= -threshold) { root._accum += threshold; root.stepDown() }
         }
     }
 

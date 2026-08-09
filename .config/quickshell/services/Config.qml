@@ -32,6 +32,10 @@ Singleton {
             gap: 6,
             columns: 4,
             scrollStep: 0.05,
+            // accumulated wheel/touchpad delta needed per step (higher = less
+            // sensitive; a mouse notch is ~120). scrollInvert mirrors direction.
+            scrollThreshold: 120,
+            scrollInvert: false,
             collapseDelay: 250,
             // base set for every host; hosts (e.g. config.player.json) replace this
             // whole list to add hardware items like wifi/bluetooth/battery.
