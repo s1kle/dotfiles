@@ -26,6 +26,9 @@ PanelWindow {
     readonly property int flyoutSpace: 360
     implicitWidth: Config.sidebar.width + flyoutSpace
     exclusiveZone: 0
+    // ignore other surfaces' exclusive zones (e.g. the TopBar) so the rail spans
+    // from the very top of the screen, not below the TopBar's reserved strip.
+    exclusionMode: ExclusionMode.Ignore
 
     // grab keyboard only while open, so normal typing isn't intercepted.
     WlrLayershell.keyboardFocus: win.expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
@@ -33,6 +36,9 @@ PanelWindow {
     property bool expanded: false
     property int selIndex: -1
     property var tiles: [] // interactive RailButtons, in creation (rail) order
+    // keep tiles built through the slide-out so they animate away with the rail
+    // (not destroyed instantly); dropped once off-screen.
+    property bool railLive: false
 
     // fixed 100 Mbit/s ceiling for the net rings (copied from Bar.qml).
     readonly property real netMax: 12.5 * 1024 * 1024
@@ -84,7 +90,12 @@ PanelWindow {
         }
     }
 
-    onExpandedChanged: if (!win.expanded) win.selIndex = -1
+    onExpandedChanged: {
+        if (win.expanded) { railHideTimer.stop(); win.railLive = true }
+        else { win.selIndex = -1; railHideTimer.restart() }
+    }
+    // outlives the 300ms slide-out, then drops the tiles.
+    Timer { id: railHideTimer; interval: 340; onTriggered: win.railLive = false }
 
     Item {
         id: triggerZone
@@ -128,7 +139,7 @@ PanelWindow {
         // idle shell stays cheap (this was making ThemeMenu janky). Vertical
         // margin only; tiles/cards bleed to the rail edges horizontally.
         Loader {
-            active: win.expanded
+            active: win.railLive
             anchors.fill: parent
             anchors.topMargin: 8
             anchors.bottomMargin: 8
