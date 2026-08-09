@@ -21,10 +21,7 @@ PanelWindow {
     visible: Config.sidebar.enabled
     color: "transparent"
     anchors { top: true; right: true; bottom: true }
-    // rail width + a transparent left margin so left-anchored flyouts have room
-    // to render without clipping at the window edge.
-    readonly property int flyoutSpace: 360
-    implicitWidth: Config.sidebar.width + flyoutSpace
+    implicitWidth: Config.sidebar.width
     // Ignore other surfaces' exclusive zones (e.g. the TopBar) so the rail spans
     // from the very top of the screen. NB: setting exclusiveZone here would force
     // the mode back to Normal, so we don't — Ignore reserves nothing anyway.
@@ -235,7 +232,6 @@ PanelWindow {
                 }
                 return 0
             }
-            detail: label + " · " + Math.round(value * 100) + "%"
         }
     }
 
@@ -253,10 +249,8 @@ PanelWindow {
                 else if (cell.id === "mic") Audio.setSourceVolume(v)
             }
             iconName: ({ volume: "volume", brightness: "brightness", mic: "mic", network: "wifi", bluetooth: "bluetooth", notifications: "bell", power: "power" })[cell.id] ?? ""
-            label: ({ volume: "Vol", brightness: "Bri", mic: "Mic" })[cell.id] ?? ""
             danger: cell.id === "power"
-            showSlider: cell.id === "volume" || cell.id === "brightness" || cell.id === "mic"
-            scrollable: showSlider
+            scrollable: cell.id === "volume" || cell.id === "brightness" || cell.id === "mic"
             selected: win.selIndex >= 0 && win.tiles[win.selIndex] === btn
             value: {
                 switch (cell.id) {
@@ -265,15 +259,6 @@ PanelWindow {
                     case "mic": return Audio.sourceVolume
                 }
                 return 0
-            }
-            detail: {
-                switch (cell.id) {
-                    case "network": return "Wi-Fi · " + (Network.wifiEnabled ? (Network.wifiSsid || "on") : "off")
-                    case "bluetooth": return "Bluetooth · " + (Bluetooth.enabled ? Bluetooth.connectedCount + " connected" : "off")
-                    case "notifications": return "Notifications · " + NotificationService.list.length
-                    case "power": return "Power menu"
-                }
-                return ""
             }
             onMoved: v => btn.applyValue(v)
             onToggled: {

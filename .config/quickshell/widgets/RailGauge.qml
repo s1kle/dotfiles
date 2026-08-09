@@ -3,15 +3,13 @@ import QtQuick
 import qs.components
 import qs.services
 
-// Ring-gauge tile: a small Progress ring labelled `label`, with a `detail`
-// flyout. value is 0..1 (controlled by the module). Covers cpu/mem/disk/
-// battery/download/upload by props alone.
+// Ring-gauge tile: a small Progress ring labelled `label`. value is 0..1
+// (controlled by the module). Covers cpu/mem/disk/battery/download/upload.
 RailTile {
     id: root
 
     property string label: ""
     property real value: 0
-    property string detail: ""
 
     Progress {
         anchors.centerIn: parent
@@ -28,6 +26,4 @@ RailTile {
         font.family: Config.font.family
         font.pixelSize: 11
     }
-
-    Flyout { visible: root.hovered; text: root.detail }
 }

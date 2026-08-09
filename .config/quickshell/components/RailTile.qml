@@ -16,6 +16,7 @@ Item {
     property bool danger: false
     property bool hoverRecolor: true
     property bool fitContent: false // true: grow to fit content (wide cards)
+    property real fill: -1 // 0..1 bottom-up value fill shown on hover; <0 = none
     readonly property alias hovered: hover.hovered
     default property alias content: body.data
 
@@ -43,6 +44,18 @@ Item {
             shadowHorizontalOffset: -7
             shadowVerticalOffset: 7
         }
+    }
+
+    // value fill, bottom-up, shown on hover (scrollable tiles). Bottom corners
+    // match the card radius; top is flat so the level line is clear.
+    Rectangle {
+        id: valueFill
+        visible: root.fill >= 0 && hover.hovered
+        anchors { left: card.left; right: card.right; bottom: card.bottom }
+        height: card.height * Math.max(0, Math.min(1, root.fill))
+        color: Theme.accent
+        bottomLeftRadius: Config.layout.radius
+        bottomRightRadius: Config.layout.radius
     }
 
     Item {

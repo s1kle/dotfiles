@@ -3,18 +3,14 @@ import QtQuick
 import qs.components
 import qs.services
 
-// Glyph tile with the ScrollableBox interaction. Optional inline slider flyout
-// (showSlider) for volume/brightness/mic; otherwise a text `detail` flyout.
-// Re-emits moved/activated/toggled for the module to route to a service, and
+// Glyph tile with the ScrollableBox interaction. Scrollable tiles show a
+// bottom-up value fill on hover so the current level is readable at a glance;
 // re-exposes stepUp/stepDown for the module's PgUp/PgDn keyboard nav.
 RailTile {
     id: root
 
     property string iconName: ""
-    property string label: ""
-    property string detail: ""
     property real value: 0
-    property bool showSlider: false
     property bool scrollable: true
     signal moved(real value)
     signal activated()
@@ -22,6 +18,11 @@ RailTile {
 
     function stepUp(): void { box.stepUp() }
     function stepDown(): void { box.stepDown() }
+
+    // scrollable tiles: fill bottom-up to `value` on hover (no hover recolor so
+    // the fill reads cleanly); other tiles keep the normal hover recolor.
+    fill: root.scrollable ? root.value : -1
+    hoverRecolor: !root.scrollable
 
     ScrollableBox {
         id: box
@@ -37,37 +38,6 @@ RailTile {
             name: root.iconName
             size: 20
             color: root.danger && root.hovered ? Theme.background : Theme.text
-        }
-    }
-
-    Flyout {
-        visible: root.hovered
-
-        Row {
-            spacing: 8
-            visible: root.showSlider
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: root.label
-                color: Theme.textDim
-                font.family: Config.font.family
-                font.pixelSize: 11
-            }
-            Slider {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 90
-                value: root.value
-                onMoved: v => root.moved(v)
-            }
-        }
-
-        Text {
-            visible: !root.showSlider
-            text: root.detail
-            color: Theme.text
-            font.family: Config.font.family
-            font.pixelSize: 12
         }
     }
 }
