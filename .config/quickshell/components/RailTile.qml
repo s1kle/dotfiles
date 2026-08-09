@@ -21,6 +21,11 @@ Item {
     readonly property alias hovered: hover.hovered
     default property alias content: body.data
 
+    // animated fill level: grows 0 -> value on hover, shrinks back on leave, and
+    // eases to the new value while scrolling.
+    property real fillLevel: (hover.hovered && root.fill >= 0) ? Math.max(0, Math.min(1, root.fill)) : 0
+    Behavior on fillLevel { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
     implicitWidth: root.size
     // square by default; cards grow to fit their content
     implicitHeight: root.fitContent ? Math.max(root.size, body.height + 2 * root.padding) : root.size
@@ -54,11 +59,11 @@ Item {
         anchors.fill: card
         radius: card.radius
         color: "transparent"
-        visible: root.fill >= 0 && hover.hovered
+        visible: root.fill >= 0 // stays visible through the shrink-out animation
 
         Rectangle {
             anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-            height: parent.height * Math.max(0, Math.min(1, root.fill))
+            height: parent.height * root.fillLevel
             color: Theme.accent
         }
     }

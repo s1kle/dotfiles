@@ -26,6 +26,9 @@ Item {
     // slot can't feed back into it as a binding loop.
     Item { id: slot; anchors.fill: parent }
 
+    // pointer cursor over interactive (scrollable/togglable) tiles.
+    HoverHandler { cursorShape: Qt.PointingHandCursor }
+
     // accumulate the (possibly tiny, high-frequency touchpad) wheel delta and
     // only step once it crosses Config.sidebar.scrollThreshold — a mouse notch
     // (~120) is one step, a touchpad needs to accrue the same. scrollInvert
