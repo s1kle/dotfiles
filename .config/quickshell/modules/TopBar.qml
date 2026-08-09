@@ -21,12 +21,27 @@ PanelWindow {
     // the expanded hover overlays without pushing windows further.
     exclusiveZone: 8 + 34
 
-    // only the pill grabs input; the rest of the strip passes through
-    mask: Region { item: pill }
+    // input = the fixed trigger zone (base) unioned with the pill (so an
+    // expanded pill wider than the zone still takes clicks). The rest of the
+    // strip passes through. Base must be a real, always-valid item — an empty
+    // base region masks nothing and even the pill stops responding.
+    mask: Region {
+        item: hoverZone
+        Region { item: pill }
+    }
 
     property bool expanded: false
     property real musicPos: 0
     readonly property bool hasMusic: Mpris.activePlayer !== null
+
+    // single collapse rule: stay open while EITHER the trigger zone or the pill
+    // is hovered, collapse only when both are false. Two independent handlers
+    // (one firing unhover while the other is still hovered) is what stuck the
+    // island collapsed on a fast pass through the zone.
+    function refreshHover() {
+        if (zoneHover.hovered || pillHover.hovered) { collapseTimer.stop(); expanded = true }
+        else collapseTimer.restart()
+    }
 
     // content-fit widths for each state; the pill animates between them and the
     // content opacity is driven by the pill's *current* width (below), so the
@@ -39,6 +54,23 @@ PanelWindow {
 
     function weatherSlot(s) {
         return s ? ({ temp: s.temp, icon: Quickshell.shellPath("assets/weather/" + Weather.iconFor(s.code) + ".svg") }) : null
+    }
+
+    // fixed invisible approach trigger centered on the collapsed pill: a cursor
+    // thrown into this patch (overshooting the small pill, or landing beside it)
+    // expands the island. The pill's own hover keeps it open once expanded, so
+    // this only needs to cover the top-edge approach — hence the short height.
+    Item {
+        id: hoverZone
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: 0
+        width: 400
+        height: 48
+
+        HoverHandler {
+            id: zoneHover
+            onHoveredChanged: win.refreshHover()
+        }
     }
 
     Rectangle {
@@ -68,10 +100,8 @@ PanelWindow {
         Behavior on height { NumberAnimation { duration: 380; easing.type: Easing.OutBack; easing.overshoot: 0.9 } }
 
         HoverHandler {
-            onHoveredChanged: {
-                if (hovered) { collapseTimer.stop(); win.expanded = true }
-                else collapseTimer.restart()
-            }
+            id: pillHover
+            onHoveredChanged: win.refreshHover()
         }
 
         // collapsed: clock + focused app
@@ -100,7 +130,11 @@ PanelWindow {
             id: rack
             anchors.centerIn: parent
             spacing: 18
-            opacity: win.progress
+            // progress² so the rack fades ahead of the (OutBack-front-loaded) width
+            // morph — otherwise the pill snaps small while these widgets linger,
+            // half-clipped, inside it. Squaring makes them vanish before the
+            // collapse looks done (and fade in a touch later on expand).
+            opacity: win.progress * win.progress
             enabled: win.expanded // no click/seek on the clipped rack while collapsed
 
             ClockWidget {
