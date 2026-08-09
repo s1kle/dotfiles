@@ -36,7 +36,7 @@ PanelWindow {
     ]
 
     function filterApps(q: string): var {
-        return Search.rank(Apps.list, q, a => a.name)
+        return Search.rank(Apps.list, q, a => a.search)
     }
 
     function open(): void { win.visible = true; search.input.forceActiveFocus() }

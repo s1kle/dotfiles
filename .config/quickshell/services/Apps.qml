@@ -24,9 +24,17 @@ Singleton {
             if (cmd.length === 0)
                 continue
             const inTerm = app.runInTerminal
+            const name = app.name || cmd[0]
+            // Searchable text: the display name plus aliases (generic name,
+            // executable, keywords, desktop id) so e.g. "nautilus" finds "Files".
+            // name-first keeps the ranker's prefix/word-start tiers name-based.
+            const search = [name, app.genericName, cmd[0],
+                            (app.keywords || []).join(" "), app.id]
+                .filter(Boolean).join(" ")
             out.push({
                 icon: app.icon || null,
-                name: app.name || cmd[0],
+                name: name,
+                search: search,
                 path: inTerm ? root.terminal : cmd[0],
                 arguments: inTerm ? ["-e"].concat(cmd) : cmd.slice(1)
             })

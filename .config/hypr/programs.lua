@@ -1,7 +1,7 @@
 --@type table<string, string>
 local programs = {
     terminal    = "kitty",
-    fileManager = "dolphin",
+    fileManager = "nautilus",
     menu        = "qs ipc call appmenu open"
 }
 
