@@ -48,6 +48,16 @@ const rowIds = r => r.cells.map(c => c.id ?? c.type)
     assert.deepStrictEqual(rows.map(rowIds), [["a"], ["divider"], ["b"]])
 }
 
+// spacer forces its own full-width row and breaks packing (like divider)
+{
+    const items = [
+        { id: "a", size: "small" }, { type: "spacer" }, { id: "b", size: "big" },
+    ]
+    const rows = packRows(items, 4)
+    assert.deepStrictEqual(rows.map(rowIds), [["a"], ["spacer"], ["b"]])
+    assert.strictEqual(rows[1].cells[0].cols, 4)
+}
+
 // unknown size defaults to small; junk items with no id/type are dropped
 {
     const items = [{ id: "a" }, { size: "small" }, { id: "b", size: "wat" }]

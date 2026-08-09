@@ -15,6 +15,11 @@ function packRows(items, columns) {
             rows.push({ cells: [{ type: "divider", size: "wide", cols: columns }] })
             continue
         }
+        if (item && item.type === "spacer") {
+            flush()
+            rows.push({ cells: [{ type: "spacer", size: "wide", cols: columns }] })
+            continue
+        }
         if (!item || item.id === undefined) continue // drop junk
         const size = SPAN[item.size] !== undefined ? item.size : "small"
         const cols = size === "wide" ? columns : SPAN[size]
