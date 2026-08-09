@@ -11,6 +11,7 @@ Item {
 
     property int size: Config.sidebar.tileSize
     property int cols: 1
+    property int padding: 8
     property bool selected: false
     property bool danger: false
     property bool hoverRecolor: true
@@ -18,7 +19,8 @@ Item {
     default property alias content: body.data
 
     implicitWidth: root.size
-    implicitHeight: root.size
+    // square by default; grows to fit taller content (wide cards)
+    implicitHeight: Math.max(root.size, body.height + 2 * root.padding)
 
     Rectangle {
         id: card

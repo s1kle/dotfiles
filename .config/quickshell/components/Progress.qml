@@ -11,6 +11,7 @@ Item {
     property real value: 0.3
     property int size: Config.progress.size
     property int lineWidth: Config.progress.width
+    property bool showLabel: true // false: hide the centered %, e.g. compact rail gauges
 
     implicitWidth: root.size
     implicitHeight: root.size
@@ -50,6 +51,7 @@ Item {
     }
 
     Text {
+        visible: root.showLabel
         anchors.centerIn: parent
         text: Math.round(root.value * 100) + "%"
         color: Theme.text
