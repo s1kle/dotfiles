@@ -1,11 +1,13 @@
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Widgets
 import QtQuick
+import QtQuick.Layouts
 
 import qs.services
 import qs.widgets
 import qs.components
-import "scripts/sidebar-layout.js" as Layout
+import "scripts/sidebar-layout.js" as Packer
 
 // Right-edge hover sidebar (primary screen only). A `trigger`-px invisible zone
 // on the screen edge springs the rail open; it collapses after an idle delay
@@ -19,7 +21,10 @@ PanelWindow {
     visible: Config.sidebar.enabled
     color: "transparent"
     anchors { top: true; right: true; bottom: true }
-    implicitWidth: Config.sidebar.width + Config.sidebar.trigger
+    // rail width + a transparent left margin so left-anchored flyouts have room
+    // to render without clipping at the window edge.
+    readonly property int flyoutSpace: 360
+    implicitWidth: Config.sidebar.width + flyoutSpace
     exclusiveZone: 0
 
     // grab keyboard only while open, so normal typing isn't intercepted.
@@ -127,27 +132,36 @@ PanelWindow {
             }
         }
 
-        Column {
+        ColumnLayout {
             anchors.fill: parent
             anchors.margins: 8
             spacing: Config.sidebar.gap
 
-            readonly property var rows: Layout.packRows(Config.sidebar.items, Config.sidebar.columns)
-
             Repeater {
-                model: parent.rows
-                delegate: Row {
+                model: Packer.packRows(Config.sidebar.items, Config.sidebar.columns)
+                delegate: Item {
+                    id: rowItem
                     required property var modelData // { cells: [...] }
-                    width: win.railInner
-                    spacing: Config.sidebar.gap
+                    readonly property var cells: modelData.cells
+                    readonly property bool isSpacer: cells.length === 1 && cells[0].type === "spacer"
+                    Layout.fillWidth: true
+                    Layout.fillHeight: isSpacer // absorbs slack, pushing later rows down
+                    implicitHeight: isSpacer ? 0 : rowFlow.implicitHeight
 
-                    Repeater {
-                        model: modelData.cells
-                        delegate: Loader {
-                            required property var modelData // a cell { id?, type?, size, cols }
-                            readonly property var cell: modelData
-                            width: cell.cols * win.unit + (cell.cols - 1) * Config.sidebar.gap
-                            sourceComponent: win.tileFor(cell)
+                    Row {
+                        id: rowFlow
+                        visible: !rowItem.isSpacer
+                        width: win.railInner
+                        spacing: Config.sidebar.gap
+
+                        Repeater {
+                            model: rowItem.isSpacer ? [] : rowItem.cells
+                            delegate: Loader {
+                                required property var modelData // a cell { id?, type?, size, cols }
+                                readonly property var cell: modelData
+                                width: cell.cols * win.unit + (cell.cols - 1) * Config.sidebar.gap
+                                sourceComponent: win.tileFor(cell)
+                            }
                         }
                     }
                 }
@@ -232,7 +246,7 @@ PanelWindow {
             id: btn
             property var cell: parent ? parent.cell : ({ cols: 1 })
             cols: cell.cols
-            glyph: ({ volume: "🔊", brightness: "☀", mic: "🎙", network: "📶", bluetooth: "ᛒ", notifications: "🔔", power: "⏻" })[cell.id] ?? ""
+            iconName: ({ volume: "volume", brightness: "brightness", mic: "mic", network: "wifi", bluetooth: "bluetooth", notifications: "bell", power: "power" })[cell.id] ?? ""
             label: ({ volume: "Vol", brightness: "Bri", mic: "Mic" })[cell.id] ?? ""
             danger: cell.id === "power"
             showSlider: cell.id === "volume" || cell.id === "brightness" || cell.id === "mic"
@@ -280,6 +294,7 @@ PanelWindow {
             property var cell: parent ? parent.cell : ({ cols: 4 })
             cols: cell.cols
             Column {
+                width: parent.width
                 spacing: 2
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -304,18 +319,35 @@ PanelWindow {
         RailCard {
             property var cell: parent ? parent.cell : ({ cols: 4 })
             cols: cell.cols
-            Row {
-                spacing: 10
-                Repeater {
-                    model: Hyprland.workspaces
-                    delegate: Rectangle {
-                        required property var modelData
-                        width: 14; height: 14; radius: 7
-                        color: modelData.active ? Theme.accent : (modelData.occupied ? Theme.textDim : "transparent")
-                        border.width: modelData.occupied || modelData.active ? 0 : 2
-                        border.color: Theme.accentMuted
-                        TapHandler { onTapped: Hyprland.switchTo(modelData.id) }
+            // dots on the left, focused monitor name on the right (space-between).
+            Item {
+                width: parent.width
+                height: 16
+
+                Row {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 10
+                    Repeater {
+                        model: Hyprland.workspaces
+                        delegate: Rectangle {
+                            required property var modelData
+                            width: 14; height: 14; radius: 7
+                            color: modelData.active ? Theme.accent : (modelData.occupied ? Theme.textDim : "transparent")
+                            border.width: modelData.occupied || modelData.active ? 0 : 2
+                            border.color: Theme.accentMuted
+                            TapHandler { onTapped: Hyprland.switchTo(modelData.id) }
+                        }
                     }
+                }
+
+                Text {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Hyprland.monitorName
+                    color: Theme.textDim
+                    font.family: Config.font.family
+                    font.pixelSize: 11
                 }
             }
         }
@@ -326,25 +358,87 @@ PanelWindow {
         RailCard {
             property var cell: parent ? parent.cell : ({ cols: 4 })
             cols: cell.cols
-            visible: win.hasMusic
-            // ponytail: reuses the full MusicWidget; if it overflows the 210px rail,
-            // shrink its maxWidth or build a compact variant in a follow-up.
-            MusicWidget {
-                coverUrl: Mpris.activePlayer ? Mpris.activePlayer.trackArtUrl : ""
-                track: Mpris.activePlayer ? Mpris.activePlayer.trackTitle : ""
-                artist: Mpris.activePlayer ? Mpris.activePlayer.trackArtist : ""
-                playing: Mpris.isPlaying
-                canPrev: Mpris.canGoPrevious
-                canNext: Mpris.canGoNext
-                canSeek: Mpris.activePlayer ? Mpris.activePlayer.canSeek : false
-                position: win.musicPos
-                length: Mpris.activePlayer ? Mpris.activePlayer.length : 0
-                onPrev: Mpris.previous()
-                onNext: Mpris.next()
-                onPlayPause: Mpris.togglePlaying()
-                onSeek: frac => {
-                    const p = Mpris.activePlayer
-                    if (p && p.canSeek) { p.position = frac * p.length; win.musicPos = frac * p.length }
+            // vertical card (fits the narrow rail); ":(" placeholder when idle.
+            Item {
+                width: parent.width
+                height: win.hasMusic ? full.implicitHeight : 64
+
+                Text {
+                    visible: !win.hasMusic
+                    anchors.centerIn: parent
+                    text: ":("
+                    color: Theme.textDim
+                    font.family: Config.font.family
+                    font.pixelSize: 26
+                }
+
+                Column {
+                    id: full
+                    visible: win.hasMusic
+                    width: parent.width
+                    spacing: 6
+
+                    ClippingRectangle {
+                        width: parent.width
+                        height: 110
+                        radius: 12
+                        color: "transparent"
+                        Rectangle {
+                            anchors.fill: parent
+                            visible: !cover.visible
+                            gradient: Gradient {
+                                GradientStop { position: 0; color: Theme.accent }
+                                GradientStop { position: 1; color: Theme.accentHover }
+                            }
+                        }
+                        Image {
+                            id: cover
+                            anchors.fill: parent
+                            source: Mpris.activePlayer ? Mpris.activePlayer.trackArtUrl : ""
+                            fillMode: Image.PreserveAspectCrop
+                            visible: source !== "" && status === Image.Ready
+                        }
+                    }
+
+                    Text {
+                        width: parent.width
+                        horizontalAlignment: Text.AlignHCenter
+                        text: Mpris.activePlayer ? Mpris.activePlayer.trackTitle : ""
+                        color: Theme.text
+                        font.family: Config.font.family
+                        font.pixelSize: 12
+                        elide: Text.ElideRight
+                    }
+                    Text {
+                        width: parent.width
+                        horizontalAlignment: Text.AlignHCenter
+                        text: Mpris.activePlayer ? Mpris.activePlayer.trackArtist : ""
+                        color: Theme.textDim
+                        font.family: Config.font.family
+                        font.pixelSize: 11
+                        elide: Text.ElideRight
+                    }
+
+                    Row {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: 10
+                        Button { text: "Prev"; fontSize: 11; hpad: 7; textColor: Theme.textDim; enabled: Mpris.canGoPrevious; onClicked: Mpris.previous() }
+                        Button { text: Mpris.isPlaying ? "Pause" : "Play"; fontSize: 11; hpad: 7; textColor: Theme.text; onClicked: Mpris.togglePlaying() }
+                        Button { text: "Next"; fontSize: 11; hpad: 7; textColor: Theme.textDim; enabled: Mpris.canGoNext; onClicked: Mpris.next() }
+                    }
+
+                    ProgressBar {
+                        width: parent.width
+                        value: {
+                            const p = Mpris.activePlayer
+                            return p && p.length > 0 ? win.musicPos / p.length : 0
+                        }
+                        seekable: Mpris.activePlayer ? Mpris.activePlayer.canSeek : false
+                        onSeek: frac => {
+                            const p = Mpris.activePlayer
+                            if (p && p.canSeek) { p.position = frac * p.length; win.musicPos = frac * p.length }
+                        }
+                    }
                 }
             }
         }
@@ -356,6 +450,7 @@ PanelWindow {
             property var cell: parent ? parent.cell : ({ cols: 4 })
             cols: cell.cols
             WeatherWidget {
+                anchors.horizontalCenter: parent.horizontalCenter
                 morning: win.weatherSlot(Weather.morning)
                 now: win.weatherSlot(Weather.now)
                 evening: win.weatherSlot(Weather.evening)
