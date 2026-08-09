@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import QtQuick.Window
 
 import qs.services
 import qs.components
@@ -166,8 +167,11 @@ PanelWindow {
             width: t ? Math.hypot(off.x, off.y) : 0
             color: Theme.accentMuted
             antialiasing: true
-            x: win.width / 2
-            y: win.height / 2 - 1
+            // Screen (not win.width) so entries are placed correctly from creation
+            // — win.width is 0 until the window first maps, which made the entries
+            // animate in from the left edge on first open.
+            x: Screen.width / 2
+            y: Screen.height / 2 - 1
             transformOrigin: Item.Left
             rotation: Math.atan2(off.y, off.x) * 180 / Math.PI
             opacity: t ? 1 : 0
@@ -187,8 +191,8 @@ PanelWindow {
             name: t ? t.name : ""
             palette: t ? t.palette : ({})
             selected: index === win.selected && t !== null
-            x: win.width / 2 - width / 2 + (t ? win.slots[index].x : 0)
-            y: win.height / 2 - height / 2 + (t ? win.slots[index].y : 0)
+            x: Screen.width / 2 - width / 2 + (t ? win.slots[index].x : 0)
+            y: Screen.height / 2 - height / 2 + (t ? win.slots[index].y : 0)
             opacity: t ? 1 : 0
             scale: t ? 1 : 0.5
             Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }

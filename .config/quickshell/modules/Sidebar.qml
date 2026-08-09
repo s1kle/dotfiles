@@ -108,7 +108,7 @@ PanelWindow {
         anchors { top: parent.top; bottom: parent.bottom }
         width: Config.sidebar.width
         x: win.expanded ? parent.width - width : parent.width // slide in from the edge
-        color: Theme.background
+        color: "transparent" // tiles/cards float over the desktop
 
         Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 

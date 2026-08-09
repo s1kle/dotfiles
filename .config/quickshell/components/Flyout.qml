@@ -20,6 +20,8 @@ Rectangle {
     implicitHeight: slot.childrenRect.height + 16
     radius: 10
     color: Theme.surface
+    border.width: 1
+    border.color: Theme.text
     opacity: visible ? 1 : 0
     visible: false
 
