@@ -1,0 +1,12 @@
+{
+  "variant": "light",
+  "background": "#eceff4",
+  "surface": "#e5e9f0",
+  "primary": "#d8dee9",
+  "secondary": "#aeb3bd",
+  "accent": "#5e81ac",
+  "accentHover": "#81a1c1",
+  "accentMuted": "#dbe1ea",
+  "text": "#2e3440",
+  "textDim": "#4c566a"
+}
