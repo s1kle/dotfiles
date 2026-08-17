@@ -186,6 +186,14 @@ qs ipc call powermenu toggle
 qs ipc call clipboard toggle
 ```
 
+## VS Code profile (`.config/vscode.code-profile`)
+
+An exported VS Code profile (settings, keybindings, extension list, theme) —
+not auto-applied by the `config` step, since VS Code doesn't read profiles
+from `~/.config` automatically. Import it manually: Command Palette →
+"Profiles: Import Profile..." → select the file, or
+`code --import-profile .config/vscode.code-profile`.
+
 ## SDDM theming (`qylock-sddm.sh`)
 
 A standalone CLI for managing [qylock](https://github.com/Darkkal44/qylock)
