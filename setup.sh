@@ -39,7 +39,7 @@ STEPS=(
     "shell|setup_shell|Set up zsh and oh-my-zsh"
     "config|setup_config|Copy dotfiles .config (hypr, kitty, quickshell, …) into ~/.config"
     "fonts|setup_fonts|Install the AnnotationMono font"
-    "extras|setup_extras|Install zen browser, wallpaper engine and sddm theme"
+    "extras|setup_extras|Interactive menu: zen browser, bluetooth, VS Code Insiders, podman, binenv, k9s, gaming meta"
 )
 
 # Resolve a step name to its function, or fail.

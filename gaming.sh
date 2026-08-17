@@ -1,1 +1,0 @@
-sudo pacman -S cachyos-gaming-meta cachyos-gaming-applications

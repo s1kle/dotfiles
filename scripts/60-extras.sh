@@ -12,6 +12,7 @@ EXTRAS=(
     podman
     binenv
     k9s
+    gaming
 )
 
 setup_extras() {
@@ -125,4 +126,12 @@ setup_k9s() {
     info "Installing k9s"
     yay -S --noconfirm k9s
     ok "k9s installed"
+}
+
+# Requires the CachyOS repos in pacman.conf (https://wiki.cachyos.org/cachyos_repo/) --
+# not part of vanilla Arch, so this is opt-in rather than a pacman-packages entry.
+setup_gaming() {
+    info "Installing CachyOS gaming meta packages"
+    sudo pacman -S --noconfirm cachyos-gaming-meta cachyos-gaming-applications
+    ok "Gaming packages installed"
 }
