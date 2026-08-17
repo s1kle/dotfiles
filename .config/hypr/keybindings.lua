@@ -1,13 +1,14 @@
-local programs = require('programs')
+local variables    = require('variables')
+local programs     = variables.programs
+local mainMod      = variables.mainMod
+local launchPrefix = variables.launchPrefix
 
-local mainMod      = "SUPER"
-local launchPrefix = "uwsm app -- "
---  qs ipc call clipboard toggle
---  qs ipc call powermenu toggle
+hl.bind(mainMod .. " + p",        hl.dsp.exec_cmd("qs ipc call powermenu toggle"))
+hl.bind(mainMod .. " + v",        hl.dsp.exec_cmd("qs ipc call clipboard toggle"))
 hl.bind(mainMod .. " + backspace",        hl.dsp.exec_cmd(launchPrefix .. programs.terminal))
 hl.bind(mainMod .. " + t",        hl.dsp.exec_cmd("qs ipc call thememenu toggle"))
 hl.bind("PRINT", hl.dsp.exec_cmd('grim -g "$(slurp)" - | tee ~/screenshot_$(date +%Y%m%d_%H%M%S).png | wl-copy'))
-hl.bind(mainMod .. " + l", hl.dsp.exec_cmd("pidof hyprlock || hyprlock"))
+hl.bind(mainMod .. " + l", hl.dsp.exec_cmd("pidof hyprlock || hyprlock --grace 0"))
 hl.bind(mainMod .. " + space",    hl.dsp.exec_cmd(launchPrefix .. programs.menu))
 hl.bind("CTRL + SHIFT + ESCAPE",        hl.dsp.exec_cmd(launchPrefix .. programs.terminal .. " -e btop"))
 hl.bind(mainMod .. " + s",        hl.dsp.exec_cmd('grim -g "$(slurp)" - | tee ~/screenshot_$(date +%Y%m%d_%H%M%S).png | wl-copy'))
@@ -46,10 +47,19 @@ hl.define_submap("focus", function ()
 end)
 
 
-hl.bind(mainMod .. " + right",      hl.dsp.focus({ workspace = "e+1" }))
-hl.bind(mainMod .. " + left",       hl.dsp.focus({ workspace = "e-1" }))
+-- Numeric wraparound workspace cycling (1-2-3-4-1), even through empty
+-- workspaces -- Hyprland's built-in +1/-1 is occupancy-aware, which isn't
+-- what we want here. Monitor names/ranges match rules.lua's workspace_rule
+-- assignment (MONITOR1 -> 1-4, MONITOR2 -> 5-8); update both when the real
+-- second monitor's output name is known on a new host.
+local cycleWs = "~/.config/hypr/scripts/cycle-workspace.sh"
 
-for i = 1, 6 do
+hl.bind(mainMod .. " + right",             hl.dsp.exec_cmd(cycleWs .. " " .. variables.monitor1 .. " 1 4 +1"))
+hl.bind(mainMod .. " + left",              hl.dsp.exec_cmd(cycleWs .. " " .. variables.monitor1 .. " 1 4 -1"))
+hl.bind(mainMod .. " + ALT + right",       hl.dsp.exec_cmd(cycleWs .. " " .. variables.monitor2 .. " 5 8 +1"))
+hl.bind(mainMod .. " + ALT + left",        hl.dsp.exec_cmd(cycleWs .. " " .. variables.monitor2 .. " 5 8 -1"))
+
+for i = 1, 8 do
     hl.bind(mainMod .. " + " .. i,        hl.dsp.focus({ workspace = i }))
 end
 
