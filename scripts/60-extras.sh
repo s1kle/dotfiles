@@ -9,6 +9,9 @@ EXTRAS=(
     zen
     bluetooth
     vscode
+    podman
+    binenv
+    k9s
 )
 
 setup_extras() {
@@ -98,4 +101,28 @@ setup_vscode() {
     info "Installing VS Code Insiders"
     yay -S --noconfirm visual-studio-code-insiders-bin
     ok "VS Code Insiders installed"
+}
+
+setup_podman() {
+    info "Installing podman"
+    sudo pacman -S --noconfirm podman podman-compose
+    # tools that hardcode "docker" (compose plugins, CI scripts, ...) work unmodified.
+    sudo tee /usr/local/bin/docker >/dev/null <<'SCRIPT'
+#!/usr/bin/env bash
+exec podman "$@"
+SCRIPT
+    sudo chmod +x /usr/local/bin/docker
+    ok "podman installed (docker -> podman shim at /usr/local/bin/docker)"
+}
+
+setup_binenv() {
+    info "Installing binenv"
+    curl -fsSL https://raw.githubusercontent.com/devops-works/binenv/master/install.sh | bash
+    ok "binenv installed"
+}
+
+setup_k9s() {
+    info "Installing k9s"
+    yay -S --noconfirm k9s
+    ok "k9s installed"
 }
