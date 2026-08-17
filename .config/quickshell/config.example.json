@@ -1,0 +1,46 @@
+{
+  "theme": { "name": "Nord" },
+  "layout": { "radius": 12, "margin": 6 },
+  "font": { "family": "Annotation Mono" },
+  "weather": { "city": "London, UK", "refreshMinutes": 15 },
+  "progress": { "size": 66, "width": 8 },
+  "topbar": {
+    "collapseDelay": 0,
+    "widgets": ["clock", "weather", "music"]
+  },
+  "sidebar": {
+    "enabled": true,
+    "width": 210,
+    "trigger": 100,
+    "tileSize": 42,
+    "gap": 6,
+    "columns": 4,
+    "scrollStep": 0.05,
+    "scrollThreshold": 120,
+    "scrollInvert": false,
+    "collapseDelay": 250,
+    "items": [
+      { "id": "clock",      "size": "wide" },
+      { "id": "calendar",   "size": "wide" },
+      { "id": "workspaces", "size": "wide" },
+      { "id": "weather",    "size": "wide" },
+      { "id": "music",      "size": "wide" },
+      { "type": "divider" },
+      { "id": "hyprlayout", "size": "small" },
+      { "type": "divider" },
+      { "id": "volume", "size": "small" }, { "id": "brightness", "size": "small" },
+      { "id": "mic",    "size": "small" }, { "id": "notifications", "size": "small" },
+      { "id": "appmenu", "size": "small" },
+      { "id": "screenshot", "size": "small" },
+      { "id": "clipboard", "size": "small" },
+      { "type": "divider" },
+      { "id": "cpu",  "size": "small" }, { "id": "mem", "size": "small" },
+      { "id": "disk", "size": "small" }, { "id": "download", "size": "small" },
+      { "id": "upload", "size": "small" },
+      { "id": "temp", "size": "small" }, { "id": "uptime", "size": "wide" },
+      { "id": "updates", "size": "small" },
+      { "type": "spacer" },
+      { "id": "power", "size": "wide" }
+    ]
+  }
+}
