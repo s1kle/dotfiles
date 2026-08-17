@@ -45,24 +45,26 @@ hl.window_rule({
     opacity = "1.0 override 1.0 override",
 })
 
--- local MONITOR1 = "eDP-1"
-local MONITOR1 = "Virtual-1"
-local MONITOR2 = "HDMI-A-1"
+local variables = require('variables')
+local MONITOR1 = variables.monitor1
+local MONITOR2 = variables.monitor2
 
-for _, ws in ipairs({ 1, 2, 3 }) do
+for _, ws in ipairs({ 1, 2, 3, 4 }) do
   hl.workspace_rule({ workspace = tostring(ws), monitor = MONITOR1 })
 end
 
-for _, ws in ipairs({ 4, 5, 6 }) do
+for _, ws in ipairs({ 5, 6, 7, 8 }) do
   hl.workspace_rule({ workspace = tostring(ws), monitor = MONITOR2 })
 end
 
 hl.window_rule({
     match      = { class = "(?i)(^steam_app_|.*game.*)" },
-    workspace = "1",
+    workspace  = "1",
     no_anim    = true,
     no_blur    = true,
     no_shadow  = true,
+    rounding   = 0,
+    opacity    = "1.0 override 1.0 override",
     immediate  = true,
     content    = "game",
     fullscreen = true
@@ -72,5 +74,7 @@ hl.window_rule({
     no_anim   = true,
     no_blur   = true,
     no_shadow = true,
+    rounding  = 0,
+    opacity   = "1.0 override 1.0 override",
     immediate = true,
 })
