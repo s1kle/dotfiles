@@ -56,6 +56,7 @@ ShellRoot {
     //  - gtkPalette:  exact palette into ~/.config/gtk-4.0/gtk.css (applies on app restart).
     Process { id: variantProc; command: ["sh", "-c", "~/.config/hypr/scripts/theme-variant.sh"] }
     Process { id: gtkPalette;  command: ["sh", "-c", "python3 ~/.config/hypr/scripts/gtk-palette.py"] }
+    Process { id: hyprlockTheme; command: ["sh", "-c", "python3 ~/.config/hypr/scripts/sync-hyprlock-theme.py"] }
 
     Connections {
         target: Config
@@ -66,6 +67,8 @@ ShellRoot {
             variantProc.running = true
             gtkPalette.running = false
             gtkPalette.running = true
+            hyprlockTheme.running = false
+            hyprlockTheme.running = true
         }
     }
     Connections {
