@@ -1,7 +1,20 @@
 # dotfiles
 
-Arch Linux + Hyprland desktop, provisioned by a set of shell scripts and
-themed by a custom [Quickshell](https://quickshell.org/) desktop shell.
+[CachyOS](https://cachyos.org/) + Hyprland desktop, provisioned by a set of
+shell scripts and themed by a custom [Quickshell](https://quickshell.org/)
+desktop shell.
+
+> **Targets CachyOS**, not vanilla Arch. A couple of provisioning steps rely
+> on CachyOS-only packages/repos (mirror ranking via `cachyos-rate-mirrors`,
+> the `yay` AUR helper being directly `pacman`-installable, the optional
+> `gaming` extra's `cachyos-gaming-meta`). Most of the rest is
+> distro-agnostic Arch shell scripting and should work on stock Arch too,
+> but this hasn't been verified there.
+>
+> Assumes **Hyprland, kitty, and SDDM are already installed** — none of the
+> provisioning steps install them. Pick CachyOS's Hyprland edition (or the
+> minimal/no-DE installer option with Hyprland + kitty + SDDM selected) so
+> they're present before running `setup.sh`.
 
 ## Install
 
@@ -23,10 +36,13 @@ git clone https://github.com/s1kle/dotfiles.git && cd dotfiles
 
 ## What's here
 
-- **`setup.sh` + `scripts/NN-*.sh`** — provisioning for a fresh Arch install:
-  mirrors, packages, shell, dotfiles, fonts, optional extras.
-- **`.config/hypr/`** — Hyprland config, written in Lua via a Lua-scriptable
-  Hyprland fork/mod (`hl.*` API) instead of the stock `hyprland.conf` syntax.
+- **`setup.sh` + `scripts/NN-*.sh`** — provisioning for a fresh CachyOS
+  install: mirrors, packages, shell, dotfiles, fonts, optional extras.
+- **`.config/hypr/`** — Hyprland config, written in **Lua** (`hl.*` API)
+  rather than the classic `hyprland.conf` syntax. This is Hyprland's own
+  native config format since 0.55 (May 2026) — `hyprland.lua` auto-loads
+  instead of `hyprland.conf` if present, no patched build or extra package
+  required.
 - **`.config/quickshell/`** — a full custom desktop shell for Hyprland: top
   bar, hover sidebar, app launcher, theme switcher, notifications, lock
   screen theming — all built on [Quickshell](https://quickshell.org/).
@@ -38,7 +54,7 @@ git clone https://github.com/s1kle/dotfiles.git && cd dotfiles
 
 | Step | What it does |
 |---|---|
-| `mirrors` | Refresh pacman mirrors (`reflector`) |
+| `mirrors` | Rank both the Arch and CachyOS mirrorlists (`cachyos-rate-mirrors`) |
 | `update` | `pacman -Syyu` |
 | `packages` | Install pacman + AUR packages (Hyprland, Quickshell, kitty, nautilus, bluez, ...) |
 | `remove` | Remove unwanted defaults (Dolphin) and set Nautilus as the default file manager |
