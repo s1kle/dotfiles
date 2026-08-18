@@ -1,12 +1,4 @@
-.DS_Store
-*.swp
-.superpowers/
 .claude/
 .config/quickshell/config.laptop.json
-testing/
+.config/quickshell/config.test.json
 /CLAUDE.md
-# design scratch (local only)
-index.html
-style.css
-*.bak
-docs/
