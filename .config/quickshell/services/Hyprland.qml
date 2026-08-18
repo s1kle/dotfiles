@@ -5,29 +5,41 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import QtQuick
 
-// Normalised Hyprland workspace list for the sidebar dots. Hyprland only tracks
-// workspaces that exist (focused or non-empty), so membership ≈ "occupied".
-// We pad up to at least `minSlots` ids so a fresh session still shows dots.
-// ponytail: single flat list, primary-monitor agnostic; add per-monitor grouping
-// only if a multi-monitor workspace row is ever needed.
+// Normalised Hyprland workspace lists for the sidebar dots, grouped per
+// monitor. Hyprland only tracks workspaces that exist (focused or
+// non-empty), so membership ≈ "occupied". rules.lua assigns each monitor a
+// contiguous `minSlots`-sized block of workspace ids (1-4, 5-8, ...), so we
+// derive each monitor's block from its own workspaces/active workspace
+// rather than hardcoding monitor->block mappings here.
 Singleton {
     id: root
 
     property int minSlots: 4
-    readonly property int focusedId: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
-    readonly property string monitorName: Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
+    readonly property var monitors: Hyprland.monitors
 
     property string tilingLayout: "dwindle"
 
-    readonly property var workspaces: {
-        const existing = {}
-        let maxId = root.minSlots
+    // Dots for one monitor only: its own `minSlots`-sized workspace block,
+    // independent of which monitor currently has focus.
+    function workspacesForMonitor(name: string): var {
+        const mon = Hyprland.monitors.values.find(m => m.name === name)
+        if (!mon) return []
+
+        const occupied = {}
+        let blockBase = mon.activeWorkspace ? Math.floor((mon.activeWorkspace.id - 1) / root.minSlots) * root.minSlots : 0
+
         for (const ws of Hyprland.workspaces.values) {
-            if (ws.id > 0) { existing[ws.id] = true; if (ws.id > maxId) maxId = ws.id }
+            if (ws.id > 0 && ws.monitor && ws.monitor.name === name) {
+                occupied[ws.id] = true
+                const base = Math.floor((ws.id - 1) / root.minSlots) * root.minSlots
+                if (base < blockBase) blockBase = base
+            }
         }
+
         const out = []
-        for (let i = 1; i <= maxId; i++) {
-            out.push({ id: i, active: i === root.focusedId, occupied: !!existing[i] })
+        for (let i = 1; i <= root.minSlots; i++) {
+            const id = blockBase + i
+            out.push({ id, active: mon.activeWorkspace ? id === mon.activeWorkspace.id : false, occupied: !!occupied[id] })
         }
         return out
     }
