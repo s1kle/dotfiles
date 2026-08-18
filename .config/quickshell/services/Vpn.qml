@@ -4,17 +4,17 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 
-// Headless Hiddify proxy control -- ~/.config/hypr/scripts/hiddify-instance.sh
-// runs HiddifyCli (the core the Hiddify GUI itself shells out to) as a
-// systemd --user unit; see that script for why we bypass the GUI, which
-// needs a display quickshell/SSH don't have. Two modes: tun (real VPN) and
-// proxy (system-proxy only); toggle() connects/disconnects in the current
-// mode, toggleMode() flips it, reconnecting immediately if already connected
-// so the switch is visible.
+// Headless Xray-core VLESS tunnel control -- ~/.config/hypr/scripts/xray-instance.sh
+// runs Xray as a systemd --user unit, no GUI app involved (quickshell/SSH
+// don't have a display for one anyway). Two modes: tun (full system-wide
+// capture via Xray's native tun inbound) and proxy (local SOCKS5 + the
+// system-proxy gsetting); toggle() connects/disconnects in the current mode,
+// toggleMode() flips it, reconnecting immediately if already connected so
+// the switch is visible.
 Singleton {
     id: root
 
-    readonly property string script: "~/.config/hypr/scripts/hiddify-instance.sh"
+    readonly property string script: "~/.config/hypr/scripts/xray-instance.sh"
 
     property bool connected: false
     property string mode: "tun" // "tun" | "proxy"

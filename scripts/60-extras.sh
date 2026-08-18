@@ -13,7 +13,7 @@ EXTRAS=(
     binenv
     k9s
     gaming
-    hiddify
+    xray
 )
 
 setup_extras() {
@@ -150,16 +150,29 @@ setup_gaming() {
     ok "Gaming packages installed"
 }
 
-# HiddifyCli (VPN client, driven headlessly by scripts/hiddify-instance.sh)
-# needs cap_net_admin to create its own tun device as a non-root user. Pacman
-# strips capabilities on every (re)install, so a pacman hook reapplies it
-# after every hiddify install/upgrade, not just this one.
-setup_hiddify() {
-    local scripts_dir
-    scripts_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    info "Installing hiddify"
-    yay -S --noconfirm hiddify
-    sudo install -Dm644 "$scripts_dir/hiddify-setcap.hook" /etc/pacman.d/hooks/hiddify-setcap.hook
-    sudo setcap cap_net_admin+ep /usr/lib/hiddify/HiddifyCli
-    ok "hiddify installed, cap_net_admin granted"
+# Xray-core (VLESS client, driven headlessly by scripts/xray-instance.sh).
+# No packaged build exists that isn't bundled for some unrelated panel
+# project, so this builds from source. Pinned to a specific commit rather
+# than `go install .../main@latest`: @latest resolved to tagged release
+# 26.3.27, whose tun inbound silently produced a non-functional route (no
+# error, device came up, but traffic never actually reached the outbound) --
+# this commit is the one actually verified end-to-end (clean TLS handshake,
+# confirmed egress via the VPN server's own IP). Bump it deliberately, not
+# casually -- re-verify tun mode before trusting a newer commit.
+#
+# Needs cap_net_admin to create/route its own tun device as a non-root user
+# for tun mode; since this binary isn't pacman-managed there's no upgrade
+# hook to reapply it automatically -- re-run this (or at least the setcap
+# line) after rebuilding.
+XRAY_VERIFIED_COMMIT=7d214f8b094f75322fa3990f8aadad1c912f24f5
+setup_xray() {
+    local tmp
+    info "Installing xray-core (built from source, pinned commit)"
+    tmp="$(mktemp -d)"
+    git clone -q https://github.com/XTLS/Xray-core "$tmp/xray-core"
+    (cd "$tmp/xray-core" && git checkout -q "$XRAY_VERIFIED_COMMIT" \
+        && go build -o "$HOME/.local/bin/xray" -trimpath ./main)
+    rm -rf "$tmp"
+    sudo setcap cap_net_admin+ep "$HOME/.local/bin/xray"
+    ok "xray installed, cap_net_admin granted"
 }
