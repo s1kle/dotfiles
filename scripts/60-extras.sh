@@ -13,6 +13,7 @@ EXTRAS=(
     binenv
     k9s
     gaming
+    hiddify
 )
 
 setup_extras() {
@@ -134,4 +135,18 @@ setup_gaming() {
     info "Installing CachyOS gaming meta packages"
     sudo pacman -S --noconfirm cachyos-gaming-meta cachyos-gaming-applications
     ok "Gaming packages installed"
+}
+
+# HiddifyCli (VPN client, driven headlessly by scripts/hiddify-instance.sh)
+# needs cap_net_admin to create its own tun device as a non-root user. Pacman
+# strips capabilities on every (re)install, so a pacman hook reapplies it
+# after every hiddify install/upgrade, not just this one.
+setup_hiddify() {
+    local scripts_dir
+    scripts_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    info "Installing hiddify"
+    yay -S --noconfirm hiddify
+    sudo install -Dm644 "$scripts_dir/hiddify-setcap.hook" /etc/pacman.d/hooks/hiddify-setcap.hook
+    sudo setcap cap_net_admin+ep /usr/lib/hiddify/HiddifyCli
+    ok "hiddify installed, cap_net_admin granted"
 }
