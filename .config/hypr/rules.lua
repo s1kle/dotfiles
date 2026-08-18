@@ -45,6 +45,13 @@ hl.window_rule({
     opacity = "1.0 override 1.0 override",
 })
 
+hl.window_rule({
+    -- zen browser: keep it fully opaque, ignore the global active/inactive_opacity dim
+    name    = "zen-opacity",
+    match   = { class = "zen" },
+    opacity = "1.0 override 1.0 override",
+})
+
 local variables = require('variables')
 local MONITOR1 = variables.monitor1
 local MONITOR2 = variables.monitor2

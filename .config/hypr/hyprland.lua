@@ -10,7 +10,7 @@ hl.config({
         blur = {
             size = 5,
         },
-        fullscreen_opacity = 0.8,
+        fullscreen_opacity = 1.0,
         rounding = 10,
         shadow = {
             offset = "2 2",
