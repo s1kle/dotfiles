@@ -26,7 +26,9 @@ RailButton {
             case "mic": return (Audio.sourceMuted || Audio.sourceVolume <= 0) ? "mic-off" : "mic"
             case "network": return Network.wifiEnabled ? "wifi" : "wifi-off"
             case "bluetooth": return Bluetooth.enabled ? "bluetooth" : "bluetooth-off"
-            case "vpn": return Vpn.connected ? "vpn" : "vpn-off"
+            case "vpn": return Vpn.mode === "proxy"
+                ? (Vpn.connected ? "proxy" : "proxy-off")
+                : (Vpn.connected ? "vpn" : "vpn-off")
             case "nightlight": return NightLight.enabled ? "nightlight" : "nightlight-off"
             case "brightness": return Brightness.value <= 0 ? "brightness-off" : "brightness"
             case "notifications": return NotificationService.dnd ? "bell-off" : "bell"
@@ -59,6 +61,7 @@ RailButton {
     onActivated: {
         if (cell.id === "power") sidebarWin.ipcCall("powermenu")
         else if (cell.id === "appmenu") sidebarWin.ipcCall("appmenu")
+        else if (cell.id === "vpn") Vpn.toggleMode() // tun <-> system-proxy; reconnects live if already on
         else if (cell.id === "screenshot") Quickshell.execDetached(["sh", "-c",
             // slurp first (cursor visible for region-picking), then hide the
             // cursor for the actual grab so it doesn't end up baked into the image.

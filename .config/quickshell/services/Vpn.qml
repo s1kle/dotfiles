@@ -4,47 +4,42 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 
-// First active NetworkManager VPN connection. ponytail: single-VPN-profile
-// assumption — extend to a picker if more than one VPN profile ever exists.
+// Headless Hiddify proxy control -- ~/.config/hypr/scripts/hiddify-instance.sh
+// runs HiddifyCli (the core the Hiddify GUI itself shells out to) as a
+// systemd --user unit; see that script for why we bypass the GUI, which
+// needs a display quickshell/SSH don't have. Two modes: tun (real VPN) and
+// proxy (system-proxy only); toggle() connects/disconnects in the current
+// mode, toggleMode() flips it, reconnecting immediately if already connected
+// so the switch is visible.
 Singleton {
     id: root
 
+    readonly property string script: "~/.config/hypr/scripts/hiddify-instance.sh"
+
     property bool connected: false
-    property string name: ""
+    property string mode: "tun" // "tun" | "proxy"
 
     function poll(): void {
-        activeProc.exec(["sh", "-c", "nmcli -t -f NAME,TYPE connection show --active | grep ':vpn$' | head -1 | cut -d: -f1"])
+        pollProc.exec(["sh", "-c", script + " status"])
     }
 
     function toggle(): void {
-        if (root.connected) {
-            downProc.exec(["nmcli", "connection", "down", root.name])
-        } else {
-            nameProc.exec(["sh", "-c", "nmcli -t -f NAME,TYPE connection show | grep ':vpn$' | head -1 | cut -d: -f1"])
-        }
+        const cmd = root.connected ? "stop" : ("start " + root.mode)
+        ctlProc.exec(["sh", "-c", script + " " + cmd])
+    }
+
+    function toggleMode(): void {
+        root.mode = root.mode === "tun" ? "proxy" : "tun"
+        if (root.connected) ctlProc.exec(["sh", "-c", script + " stop && " + script + " start " + root.mode])
     }
 
     Process {
-        id: activeProc
+        id: pollProc
         stdout: StdioCollector {
-            onStreamFinished: {
-                const n = text.trim()
-                root.connected = n !== ""
-                if (n !== "") root.name = n
-            }
+            onStreamFinished: root.connected = text.trim() === "active"
         }
     }
-    Process { id: downProc; onExited: root.poll() }
-    Process {
-        id: nameProc
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const n = text.trim()
-                if (n !== "") { root.name = n; upProc.exec(["nmcli", "connection", "up", n]) }
-            }
-        }
-    }
-    Process { id: upProc; onExited: root.poll() }
+    Process { id: ctlProc; onExited: root.poll() }
 
     Timer { interval: 5000; repeat: true; running: true; triggeredOnStart: true; onTriggered: root.poll() }
 }

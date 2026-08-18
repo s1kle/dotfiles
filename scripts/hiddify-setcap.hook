@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Path
+Target = usr/lib/hiddify/HiddifyCli
+
+[Action]
+Description = Granting HiddifyCli cap_net_admin (non-root tun mode)...
+When = PostTransaction
+Exec = /usr/bin/setcap cap_net_admin+ep /usr/lib/hiddify/HiddifyCli
