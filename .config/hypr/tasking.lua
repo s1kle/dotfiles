@@ -1,9 +1,15 @@
 -- Hyprtasking: workspace-overview plugin (https://github.com/raybbian/hyprtasking).
 -- Installed via `hyprpm` (see setup.sh's `setup_hyprtasking`).
 --
--- Linear layout, not grid: this repo cycles a flat strip of 4 workspaces per
--- monitor (see keybindings.lua's cycleWs), so a 2D grid would leave most
--- cells empty -- linear mirrors that existing scheme directly.
+-- Grid, not linear: linear's overview is one flat strip across ALL
+-- workspaces on ALL monitors, so move("right") from ws1 could land on ws5
+-- (monitor2) once ws3/ws4 run out, rather than respecting rules.lua's
+-- per-monitor workspace_rule binding. Grid's per-view slot assignment
+-- filters to only the workspaces bound to that monitor (see grid.cpp's
+-- "No two grids may map the same WORKSPACEID" comment), so it can't cross
+-- monitors on its own -- that's what move("out") is for. rows=1 cols=4
+-- mirrors the existing "flat strip of 4 workspaces per monitor" scheme
+-- (keybindings.lua's cycleWs) with zero empty cells.
 
 local variables = require('variables')
 local mainMod   = variables.mainMod
@@ -29,7 +35,7 @@ hl.bind(mainMod .. " + SHIFT + l", function() hl.plugin.hyprtasking.movewindow("
 hl.config({
     plugin = {
         hyprtasking = {
-            layout = "linear",
+            layout = "grid",
 
             gap_size = 10,
             -- Nord theme's background (quickshell's default, services/Theme.qml)
@@ -38,11 +44,13 @@ hl.config({
             border_size = 2,
             exit_on_hovered = false,
 
-            linear = {
-                top = false,
-                height = 400,
-                scroll_speed = 1.0,
-                blur = false,
+            grid = {
+                rows = 1,
+                cols = 4,
+                layers = 1,
+                loop = true,
+                loop_layers = true,
+                gaps_use_aspect_ratio = true,
             },
         },
     },
