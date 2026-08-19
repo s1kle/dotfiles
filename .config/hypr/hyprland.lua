@@ -4,6 +4,7 @@ require('hyprenv')
 require('keybindings')
 require('rules')
 require('visual')
+require('tasking')
 
 hl.config({
     decoration = {
