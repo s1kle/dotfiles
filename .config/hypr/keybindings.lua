@@ -7,6 +7,7 @@ hl.bind(mainMod .. " + p",        hl.dsp.exec_cmd("qs ipc call powermenu toggle"
 hl.bind(mainMod .. " + v",        hl.dsp.exec_cmd("qs ipc call clipboard toggle"))
 hl.bind(mainMod .. " + backspace",        hl.dsp.exec_cmd(launchPrefix .. programs.terminal))
 hl.bind(mainMod .. " + t",        hl.dsp.exec_cmd("qs ipc call thememenu toggle"))
+hl.bind(mainMod .. " + grave",    hl.dsp.exec_cmd("qs ipc call topbar toggle"))
 hl.bind("PRINT", hl.dsp.exec_cmd('grim -g "$(slurp)" - | tee ~/screenshot_$(date +%Y%m%d_%H%M%S).png | wl-copy'))
 hl.bind(mainMod .. " + space",    hl.dsp.exec_cmd(launchPrefix .. programs.menu))
 hl.bind("CTRL + SHIFT + ESCAPE",        hl.dsp.exec_cmd(launchPrefix .. programs.terminal .. " -e btop"))

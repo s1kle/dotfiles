@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
@@ -17,9 +18,27 @@ PanelWindow {
     color: "transparent"
     anchors { top: true; left: true; right: true }
     implicitHeight: 96
-    // reserve only the collapsed pill's strip (top margin + collapsed height);
-    // the expanded hover overlays without pushing windows further.
-    exclusiveZone: 8 + 34
+
+    // SUPER+` (see keybindings.lua) fully hides the bar and drops its
+    // exclusive zone, handing that strip back to tiled windows -- distinct
+    // from the hover collapse/expand below, which always keeps the
+    // collapsed pill's space reserved.
+    property bool autohidden: false
+    visible: !autohidden
+    // reserve only the collapsed pill's strip (top margin + collapsed height)
+    // when shown; the expanded hover overlays without pushing windows
+    // further, so it doesn't grow the zone either.
+    exclusiveZone: autohidden ? 0 : (8 + 34)
+
+    function toggleAutohide() {
+        autohidden = !autohidden
+        if (autohidden) expanded = false
+    }
+
+    IpcHandler {
+        target: "topbar"
+        function toggle(): void { win.toggleAutohide() }
+    }
 
     // input = the fixed trigger zone (base) unioned with the pill (so an
     // expanded pill wider than the zone still takes clicks). The rest of the
