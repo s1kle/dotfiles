@@ -14,6 +14,7 @@ EXTRAS=(
     k9s
     gaming
     xray
+    hyprtasking
 )
 
 setup_extras() {
@@ -175,4 +176,47 @@ setup_xray() {
     rm -rf "$tmp"
     sudo setcap cap_net_admin+ep "$HOME/.local/bin/xray"
     ok "xray installed, cap_net_admin granted"
+}
+
+# Hyprtasking (workspace-overview Hyprland plugin, hypr/tasking.lua drives
+# it). Built by hyprpm against the exact running Hyprland ABI, so it's
+# reinstalled by re-running this rather than upgraded independently -- if
+# Hyprland gets updated, `hyprpm update` (or a re-run of this) is needed to
+# rebuild against the new ABI. meson, glaze and hyprland-protocols are
+# hyprpm's build deps (per `pacman -Qi hyprland`'s optional deps) and none
+# are in PACMAN_PACKAGES.
+#
+# Built from a local patched clone, not straight from upstream: upstream's
+# meson.build globs *.cpp from the project root, which (with meson >= ~1.12)
+# also sweeps up meson's own transient compiler sanity-check file under
+# build/meson-private/ -- gone by the time ninja tries to compile it, so the
+# build fails 100% of the time against current meson. Excluding build/ from
+# the glob fixes it; upstream (https://github.com/raybbian/hyprtasking)
+# hasn't touched meson.build since ~v0.47.0, so don't wait on a fix there.
+setup_hyprtasking() {
+    info "Installing hyprtasking (Hyprland workspace-overview plugin, via hyprpm)"
+    sudo pacman -S --needed --noconfirm meson glaze hyprland-protocols
+
+    local src="$HOME/.local/src/hyprtasking-patched"
+    if [[ -d "$src/.git" ]]; then
+        git -C "$src" fetch --quiet origin
+        git -C "$src" reset --quiet --hard origin/HEAD
+    else
+        git clone --quiet https://github.com/raybbian/hyprtasking "$src"
+    fi
+    sed -i -E "s|run_command\('find', '\.', '-name', '\*\.cpp', check: true\)|run_command('find', '.', '-name', '*.cpp', '-not', '-path', './build/*', check: true)|" \
+        "$src/meson.build"
+    git -C "$src" -c user.email="dotfiles@localhost" -c user.name="dotfiles setup" \
+        commit --quiet -am "local: exclude build/ from cpp source glob (meson sanity-check file collision)"
+
+    if hyprpm list | grep -q hyprtasking; then
+        # hyprpm remove unreliably leaves the on-disk repo dir behind (its own
+        # "failed to remove dir" bug) even after the confirmation succeeds --
+        # clear it directly so the next `add` doesn't see a stale install.
+        yes | hyprpm remove hyprtasking >/dev/null || true
+        rm -rf "/var/cache/hyprpm/$USER/hyprtasking"
+    fi
+    yes | hyprpm add "file://$src"
+    hyprpm enable hyprtasking
+    ok "hyprtasking installed and enabled"
 }
