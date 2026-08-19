@@ -5,9 +5,8 @@ import qs.services
 import qs.components
 import qs.widgets
 
-// Music card: cover art, transport buttons, seekable progress bar, ":("
-// placeholder when no player is active. `sidebarWin` supplies hasMusic/musicPos so
-// the seek bar tracks the sidebar's shared 1s poll (see Sidebar.qml).
+// Music card: cover art, transport buttons, ":(" placeholder when no player
+// is active. `sidebarWin` supplies hasMusic.
 RailCard {
     required property var sidebarWin
     property var cell: parent ? parent.cell : ({ cols: 4 })
@@ -79,19 +78,6 @@ RailCard {
                 Button { text: "Prev"; fontSize: 11; hpad: 7; textColor: Theme.textDim; enabled: Mpris.canGoPrevious; onClicked: Mpris.previous() }
                 Button { text: Mpris.isPlaying ? "Pause" : "Play"; fontSize: 11; hpad: 7; textColor: Theme.text; onClicked: Mpris.togglePlaying() }
                 Button { text: "Next"; fontSize: 11; hpad: 7; textColor: Theme.textDim; enabled: Mpris.canGoNext; onClicked: Mpris.next() }
-            }
-
-            ProgressBar {
-                width: parent.width
-                value: {
-                    const p = Mpris.activePlayer
-                    return p && p.length > 0 ? sidebarWin.musicPos / p.length : 0
-                }
-                seekable: Mpris.activePlayer ? Mpris.activePlayer.canSeek : false
-                onSeek: frac => {
-                    const p = Mpris.activePlayer
-                    if (p && p.canSeek) { p.position = frac * p.length; sidebarWin.musicPos = frac * p.length }
-                }
             }
         }
     }

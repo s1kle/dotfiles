@@ -31,7 +31,6 @@ PanelWindow {
     }
 
     property bool expanded: false
-    property real musicPos: 0
     readonly property bool hasMusic: Mpris.activePlayer !== null
 
     // single collapse rule: stay open while EITHER the trigger zone or the pill
@@ -90,16 +89,9 @@ PanelWindow {
             playing: Mpris.isPlaying
             canPrev: Mpris.canGoPrevious
             canNext: Mpris.canGoNext
-            canSeek: Mpris.activePlayer ? Mpris.activePlayer.canSeek : false
-            position: win.musicPos
-            length: Mpris.activePlayer ? Mpris.activePlayer.length : 0
             onPrev: Mpris.previous()
             onNext: Mpris.next()
             onPlayPause: Mpris.togglePlaying()
-            onSeek: frac => {
-                const p = Mpris.activePlayer
-                if (p && p.canSeek) { p.position = frac * p.length; win.musicPos = frac * p.length }
-            }
         }
     }
 
@@ -215,19 +207,4 @@ PanelWindow {
         onTriggered: win.expanded = false
     }
 
-    // poll music position while the rack is open
-    Timer {
-        interval: 1000
-        running: win.expanded
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: win.musicPos = Mpris.activePlayer ? Mpris.activePlayer.position : 0
-    }
-
-    // reset the bar the instant the track changes, instead of waiting for the
-    // next poll tick (bar was lagging ~1s behind prev/next).
-    Connections {
-        target: Mpris.activePlayer
-        function onTrackTitleChanged() { win.musicPos = 0 }
-    }
 }

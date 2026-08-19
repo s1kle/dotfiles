@@ -5,7 +5,7 @@ import Quickshell.Widgets
 import qs.services
 import qs.components
 
-// Dumb: album cover + track/artist + prev/playpause/next + seekable progress.
+// Dumb: album cover + track/artist + prev/playpause/next.
 // Placeholders below; signals go back to the module (which drives Mpris).
 Row {
     id: root
@@ -16,14 +16,10 @@ Row {
     property bool playing: false
     property bool canPrev: false
     property bool canNext: false
-    property bool canSeek: false
-    property real position: 0
-    property real length: 0
 
     signal prev()
     signal next()
     signal playPause()
-    signal seek(real fraction)
 
     spacing: 10
 
@@ -62,15 +58,10 @@ Row {
         property int maxWidth: 260
         anchors.verticalCenter: parent.verticalCenter
         // cap off meta's own implicitWidth (a Layout computes it from child
-        // hints, independent of allocated width) — referencing inner.implicitWidth
-        // instead loops through inner.width → main.width → 0.
+        // hints, independent of allocated width) — referencing main.width
+        // instead loops through meta.width → main.width → 0.
         implicitWidth: Math.min(maxWidth, meta.implicitWidth)
-        implicitHeight: inner.implicitHeight
-
-        Column {
-        id: inner
-        width: parent.width
-        spacing: 6
+        implicitHeight: meta.implicitHeight
 
         RowLayout {
             id: meta
@@ -128,14 +119,6 @@ Row {
                     onClicked: root.next()
                 }
             }
-        }
-
-        ProgressBar {
-            width: parent.width
-            value: root.length > 0 ? root.position / root.length : 0
-            seekable: root.canSeek
-            onSeek: frac => root.seek(frac)
-        }
         }
     }
 }

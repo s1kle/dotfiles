@@ -43,7 +43,6 @@ PanelWindow {
 
     // fixed 100 Mbit/s ceiling for the net rings.
     readonly property real netMax: 12.5 * 1024 * 1024
-    property real musicPos: 0
     readonly property bool hasMusic: Mpris.activePlayer !== null
 
     // full rail width per row (no horizontal padding — tiles/cards bleed to the
@@ -158,19 +157,6 @@ PanelWindow {
 
     Timer { id: collapseTimer; interval: Config.sidebar.collapseDelay; onTriggered: win.expanded = false }
     Process { id: ipcProc }
-
-    // poll music position while the rail is open (mirrors TopBar).
-    Timer {
-        interval: 1000
-        running: win.expanded && win.hasMusic
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: win.musicPos = Mpris.activePlayer ? Mpris.activePlayer.position : 0
-    }
-    Connections {
-        target: Mpris.activePlayer
-        function onTrackTitleChanged() { win.musicPos = 0 }
-    }
 
     // pause the heavy stats poll while the rail is closed (nothing shows it).
     Binding { target: SystemUsage; property: "active"; value: win.expanded }
