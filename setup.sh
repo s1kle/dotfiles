@@ -11,11 +11,16 @@
 
 set -eo pipefail
 
-if [[ -z "$DOTFILES_CLONED" ]]; then
+# curl-piped execution (curl ... | bash) has no local checkout to run from,
+# so self-clone into a temp dir once and re-exec from there. Skip this
+# entirely when already running from a real checkout -- BASH_SOURCE[0]'s
+# directory has scripts/ sitting right next to it -- so a plain ./setup.sh
+# uses local edits instead of silently pulling a fresh copy of origin.
+if [[ -z "$DOTFILES_CLONED" ]] && { [[ -z "${BASH_SOURCE[0]:-}" ]] || [[ ! -d "$(dirname "${BASH_SOURCE[0]}")/scripts" ]]; }; then
     export DOTFILES_CLONED=1
     TMP_DIR="$(mktemp -d)"
     trap 'rm -rf "$TMP_DIR"' EXIT
-    
+
     echo "Cloning dotfiles repository..."
     git clone --depth 1 https://github.com/s1kle/dotfiles.git "$TMP_DIR"
     cd "$TMP_DIR"
