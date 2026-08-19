@@ -1,4 +1,8 @@
 hl.on("hyprland.start", function ()
+    -- hyprpm doesn't auto-load enabled plugins into a fresh Hyprland
+    -- instance on its own -- without this, tasking.lua's binds call into
+    -- a nil hl.plugin.hyprtasking and error out the moment they fire.
+    hl.exec_cmd("hyprpm reload -n")
     hl.exec_cmd("quickshell")
     hl.exec_cmd("hypridle")
     hl.exec_cmd("wl-paste --watch cliphist store &") -- feeds the sidebar clipboard-history tile
