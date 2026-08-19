@@ -18,7 +18,7 @@ import "scripts/sidebar-layout.js" as Packer
 PanelWindow {
     id: win
 
-    screen: Quickshell.screens[0]
+    screen: Quickshell.screens[1]
     visible: Config.sidebar.enabled
     color: "transparent"
     anchors { top: true; right: true; bottom: true }

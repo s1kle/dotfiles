@@ -1,4 +1,5 @@
 .claude/
+.config/quickshell/config.desktop.json
 .config/quickshell/config.laptop.json
 .config/quickshell/config.test.json
 /CLAUDE.md

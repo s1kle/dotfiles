@@ -8,7 +8,8 @@
 set -euo pipefail
 
 WALLPAPER_DIR="$HOME/.config/wallpapers-static"
-MONITOR="eDP-1"
+MONITOR1="DP-1"
+MONITOR2="HDMI-A-1"
 SOCK="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.hyprpaper.sock"
 
 pkill -x hyprpaper 2>/dev/null || true
@@ -25,4 +26,5 @@ for _ in $(seq 1 50); do
 done
 
 img=$(find "$WALLPAPER_DIR" -name '*.png' | shuf -n 1)
-hyprctl hyprpaper wallpaper "$MONITOR,$img"
+hyprctl hyprpaper wallpaper "$MONITOR1,$img"
+hyprctl hyprpaper wallpaper "$MONITOR2,$img"

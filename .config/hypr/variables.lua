@@ -14,7 +14,7 @@ local variables = {
 
     -- Output names driving workspace assignment (rules.lua) and per-monitor
     -- workspace cycling (keybindings.lua). monitor1 was "eDP-1" on the laptop.
-    monitor1 = "Virtual-1",
+    monitor1 = "DP-1",
     monitor2 = "HDMI-A-1",
 }
 

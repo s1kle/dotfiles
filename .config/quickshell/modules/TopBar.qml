@@ -13,7 +13,7 @@ import qs.widgets
 PanelWindow {
     id: win
 
-    screen: Quickshell.screens[0] // primary
+    screen: Quickshell.screens[1] // primary
     color: "transparent"
     anchors { top: true; left: true; right: true }
     implicitHeight: 96
