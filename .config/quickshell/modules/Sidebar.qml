@@ -107,6 +107,7 @@ PanelWindow {
     Item {
         id: triggerZone
         anchors { top: parent.top; right: parent.right; bottom: parent.bottom }
+        anchors.topMargin: Config.sidebar.triggerTopMargin
         width: Config.sidebar.trigger
         HoverHandler { id: zoneHover; onHoveredChanged: win.refreshHover() }
     }

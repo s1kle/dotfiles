@@ -24,6 +24,11 @@ Singleton {
             enabled: true,
             width: 210,
             trigger: 100,
+            // keeps the edge-hover strip off the top corner, where a maximized
+            // window's own titlebar buttons (close/maximize) usually sit --
+            // otherwise the strip (full monitor height by default) eats clicks
+            // meant for those buttons even while the rail is collapsed.
+            triggerTopMargin: 48,
             tileSize: 42,
             gap: 6,
             columns: 4,

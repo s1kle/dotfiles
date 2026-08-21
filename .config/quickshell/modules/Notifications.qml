@@ -16,6 +16,11 @@ PanelWindow {
     implicitWidth: 260 + win.sh + Config.layout.margin
     implicitHeight: Math.max(1, col.implicitHeight + 2 * win.sh)
     exclusiveZone: 0
+    // Without a mask the whole (invisible) window blocks clicks in the
+    // top-right corner even with zero notifications -- restrict input to the
+    // actual card column, which is empty/zero-size when there's nothing to
+    // show, so clicks pass through to whatever's underneath.
+    mask: Region { item: col }
 
     Column {
         id: col
