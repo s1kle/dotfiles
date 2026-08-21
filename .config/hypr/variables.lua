@@ -7,9 +7,10 @@ local variables = {
     launchPrefix = "uwsm app -- ",
 
     programs = {
-        terminal    = "kitty",
-        fileManager = "nautilus",
-        menu        = "qs ipc call appmenu open",
+        terminal        = "kitty",
+        fileManager     = "nautilus",
+        menu            = "qs ipc call appmenu open",
+        wallpaperPicker = "waypaper",
     },
 
     -- Output names driving workspace assignment (rules.lua) and per-monitor

@@ -15,6 +15,8 @@ EXTRAS=(
     gaming
     xray
     hyprtasking
+    wallpaperengine
+    wallpapers
 )
 
 setup_extras() {
@@ -219,4 +221,30 @@ setup_hyprtasking() {
     yes | hyprpm add "file://$src"
     hyprpm enable hyprtasking
     ok "hyprtasking installed and enabled"
+}
+
+# linux-wallpaperengine: live animated Wallpaper Engine scenes. Not needed for
+# the default desktop -- hyprpaper + scripts/wallpaper.sh (static wallpapers,
+# near-0% idle) is the primary path -- so this is opt-in rather than a
+# PACMAN_PACKAGES/AUR_PACKAGES entry.
+setup_wallpaperengine() {
+    info "Installing linux-wallpaperengine-git"
+    yay -S --noconfirm linux-wallpaperengine-git
+    ok "linux-wallpaperengine-git installed"
+}
+
+# Full local mirror of dharmx/walls (github.com/dharmx/walls) -- ~3GB of
+# wallpapers grouped into the same theme/style folders as the upstream repo
+# (abstract/, anime/, architecture/, ...), so a picker app can filter/switch
+# by category. Opt-in: too large to pull on every provisioning run.
+WALLS_REPO_DEST="$HOME/walls"
+setup_wallpapers() {
+    info "Downloading dharmx/walls wallpaper collection to $WALLS_REPO_DEST (~3GB, this'll take a while)"
+    if [[ -d "$WALLS_REPO_DEST/.git" ]]; then
+        git -C "$WALLS_REPO_DEST" fetch --quiet --depth 1 origin
+        git -C "$WALLS_REPO_DEST" reset --quiet --hard origin/HEAD
+    else
+        git clone --quiet --depth 1 https://github.com/dharmx/walls "$WALLS_REPO_DEST"
+    fi
+    ok "Wallpapers downloaded to $WALLS_REPO_DEST"
 }

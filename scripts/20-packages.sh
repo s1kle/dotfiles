@@ -16,6 +16,7 @@ PACMAN_PACKAGES=(
     hyprpolkitagent
     xdg-desktop-portal-hyprland
     hyprlock
+    hyprpaper
     hyprsunset
     mako
     hypridle
@@ -35,12 +36,12 @@ PACMAN_PACKAGES=(
     libnetfilter_queue
     bluez              # bluetoothd; services/Bluetooth.qml talks to it over D-Bus
     bluez-utils        # bluetoothctl (CLI), bluetuith's backend
+    waypaper           # wallpaper picker with thumbnail previews, SUPER+w
 )
 
 AUR_PACKAGES=(
     hyprqt6engine
     hyprmod
-    linux-wallpaperengine-git
     nautilus-open-any-terminal  # "Open Terminal Here" -> kitty
     bluetuith                   # TUI bluetooth manager, sidebar bluetooth tile left-click
 )

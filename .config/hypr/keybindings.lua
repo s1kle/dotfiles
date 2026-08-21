@@ -14,6 +14,10 @@ hl.bind("CTRL + SHIFT + ESCAPE",        hl.dsp.exec_cmd(launchPrefix .. programs
 hl.bind(mainMod .. " + s",        hl.dsp.exec_cmd('grim -g "$(slurp)" - | tee ~/screenshot_$(date +%Y%m%d_%H%M%S).png | wl-copy'))
 hl.bind(mainMod .. " + e",        hl.dsp.exec_cmd(launchPrefix .. programs.fileManager))
 hl.bind(mainMod .. " + escape",   hl.dsp.exec_cmd("hyprctl reload"))
+-- Wallpaper picker with thumbnail previews over the local dharmx/walls
+-- mirror (~/walls, see scripts/60-extras.sh's `wallpapers`
+-- extra); monitor targeting happens inside waypaper itself.
+hl.bind(mainMod .. " + w",        hl.dsp.exec_cmd(launchPrefix .. programs.wallpaperPicker))
 
 hl.bind(mainMod .. " + c",                hl.dsp.window.close())
 hl.bind(mainMod .. " + q",                hl.dsp.window.close())
