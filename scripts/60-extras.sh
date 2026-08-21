@@ -136,10 +136,15 @@ setup_binenv() {
     echo -e '\nexport PATH=~/.binenv:$PATH' >> ~/.zshrc
     echo "source <(binenv completion zsh)" >> ~/.zshrc
     # GUI apps launched from a desktop launcher (not a shell, e.g. VS Code)
-    # don't source .zshrc, so binenv is missing from their PATH.
-    # systemd user environment.d covers those too.
-    mkdir -p ~/.config/environment.d
-    echo 'PATH=%h/.binenv:${PATH}' > ~/.config/environment.d/binenv.conf
+    # don't source .zshrc, so binenv is missing from their PATH. Hyprland is
+    # launched directly by SDDM with the bare system PATH, and doesn't import
+    # shell rc files or systemd environment.d for anything it spawns
+    # (launcher, VS Code, ...) -- systemd user environment.d only reaches
+    # apps started via systemd/D-Bus activation, which nothing here uses, so
+    # PATH has to be set via Hyprland's own hl.env() in hyprenv.lua instead.
+    if [[ -f ~/.config/hypr/hyprenv.lua ]] && ! grep -q 'hl.env("PATH"' ~/.config/hypr/hyprenv.lua; then
+        printf '\nhl.env("PATH", os.getenv("HOME") .. "/.binenv:" .. os.getenv("PATH"))\n' >> ~/.config/hypr/hyprenv.lua
+    fi
     exec $SHELL
     ok "binenv installed"
 }
