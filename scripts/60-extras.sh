@@ -130,11 +130,16 @@ setup_binenv() {
     ./binenv update
     ./binenv install binenv
     rm binenv
-    if [[ -n $BASH ]]; then ZESHELL=bash; fi
-    if [[ -n $ZSH_NAME ]]; then ZESHELL=zsh; fi
-    echo $ZESHELL
-    echo -e '\nexport PATH=~/.binenv:$PATH' >> ~/.${ZESHELL}rc
-    echo "source <(binenv completion ${ZESHELL})" >> ~/.${ZESHELL}rc
+    # This repo always installs zsh as the login shell (see 30-shell.sh),
+    # so target it directly instead of guessing from $BASH/$ZSH_NAME —
+    # those reflect the shell setup.sh happens to run under, not zsh.
+    echo -e '\nexport PATH=~/.binenv:$PATH' >> ~/.zshrc
+    echo "source <(binenv completion zsh)" >> ~/.zshrc
+    # GUI apps launched from a desktop launcher (not a shell, e.g. VS Code)
+    # don't source .zshrc, so binenv is missing from their PATH.
+    # systemd user environment.d covers those too.
+    mkdir -p ~/.config/environment.d
+    echo 'PATH=%h/.binenv:${PATH}' > ~/.config/environment.d/binenv.conf
     exec $SHELL
     ok "binenv installed"
 }
