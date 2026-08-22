@@ -19,7 +19,7 @@ desktop shell.
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/s1kle/dotfiles/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/senshu-dev/dotfiles/main/setup.sh | bash
 ```
 
 This clones the repo to a temp directory and runs every provisioning step in
@@ -28,7 +28,7 @@ order (mirrors, packages, shell, config, fonts, extras). Safe to re-run.
 To run only some steps, clone the repo yourself and pass step names:
 
 ```bash
-git clone https://github.com/s1kle/dotfiles.git && cd dotfiles
+git clone https://github.com/senshu-dev/dotfiles.git && cd dotfiles
 ./setup.sh config fonts   # e.g. just reinstall config + fonts
 ./setup.sh --list         # list all step names
 ./setup.sh --help
