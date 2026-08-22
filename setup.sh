@@ -22,7 +22,7 @@ if [[ -z "$DOTFILES_CLONED" ]] && { [[ -z "${BASH_SOURCE[0]:-}" ]] || [[ ! -d "$
     trap 'rm -rf "$TMP_DIR"' EXIT
 
     echo "Cloning dotfiles repository..."
-    git clone --depth 1 https://github.com/s1kle/dotfiles.git "$TMP_DIR"
+    git clone --depth 1 https://github.com/senshu-dev/dotfiles.git "$TMP_DIR"
     cd "$TMP_DIR"
     exec bash setup.sh "$@"
     exit
