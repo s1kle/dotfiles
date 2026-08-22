@@ -40,17 +40,6 @@ hl.bind(mainMod .. " + CONTROL + mouse_down",        hl.dsp.window.resize({ x = 
 hl.bind(mainMod .. " + CONTROL + mouse_up",        hl.dsp.window.resize({ x = 0, y = 100, relative = true }))
 
 
-hl.bind("ALT + SPACE", hl.dsp.submap("focus"))
-hl.define_submap("focus", function ()
-    hl.bind("left",             hl.dsp.focus({ direction = "left" }))
-    hl.bind("right",            hl.dsp.focus({ direction = "right" }))
-    hl.bind("up",               hl.dsp.focus({ direction = "up" }))
-    hl.bind("down",             hl.dsp.focus({ direction = "down" }))
-
-    hl.bind("escape", hl.dsp.submap("reset"))
-end)
-
-
 -- Numeric wraparound workspace cycling (1-2-3-4-1), even through empty
 -- workspaces -- Hyprland's built-in +1/-1 is occupancy-aware, which isn't
 -- what we want here. Monitor names/ranges match rules.lua's workspace_rule
